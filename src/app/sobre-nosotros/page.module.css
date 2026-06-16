@@ -1,0 +1,122 @@
+.wrap {
+  background: #fff;
+}
+
+.hero {
+  padding: 64px 48px;
+  background:
+    radial-gradient(110% 90% at 80% 0%, var(--pink-wash), rgba(255, 255, 255, 0) 55%),
+    linear-gradient(180deg, #fff, var(--graphite-50));
+}
+
+.heroInner {
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #b32440;
+  background: var(--pink-soft);
+  padding: 7px 14px;
+  border-radius: 999px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 54px;
+  line-height: 1.05;
+  color: var(--text-strong);
+  margin-top: 18px;
+}
+.accent {
+  color: var(--pink);
+  font-style: italic;
+}
+
+.lead {
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--text-muted);
+  margin-top: 18px;
+}
+
+.body {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 56px 48px;
+}
+
+.values {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.valueCard {
+  background: #fff;
+  border: 1px solid var(--border-subtle);
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: var(--shadow-card);
+}
+.valueTitle {
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--text-strong);
+  margin-top: 14px;
+}
+.valueText {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 48px;
+  padding: 36px;
+  background: var(--graphite-50);
+  border-radius: 28px;
+  flex-wrap: wrap;
+}
+.ctaText {
+  max-width: 420px;
+}
+.ctaTitle {
+  font-family: var(--font-display);
+  font-size: 26px;
+  color: var(--text-strong);
+}
+.ctaCopy {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+.ctaBtn {
+  margin-top: 14px;
+}
+
+@media (max-width: 760px) {
+  .hero {
+    padding: 48px 20px;
+  }
+  .title {
+    font-size: 38px;
+  }
+  .body {
+    padding: 40px 20px;
+  }
+  .values {
+    grid-template-columns: 1fr;
+  }
+}

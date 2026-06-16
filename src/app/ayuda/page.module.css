@@ -1,0 +1,25 @@
+.title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 44px;
+  color: var(--text-strong);
+  margin-bottom: 8px;
+}
+
+.intro {
+  font-size: 15px;
+  color: var(--text-muted);
+  margin-bottom: 26px;
+}
+
+.sectionIntro {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  max-width: 620px;
+}
+
+.returnCta {
+  margin-top: 22px;
+}

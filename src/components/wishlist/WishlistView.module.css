@@ -1,0 +1,7 @@
+.heading {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 42px;
+  color: var(--text-strong);
+  margin-bottom: 24px;
+}

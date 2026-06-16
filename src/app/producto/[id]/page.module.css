@@ -1,0 +1,11 @@
+.related {
+  margin-top: 64px;
+}
+
+.relatedTitle {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 30px;
+  color: var(--text-strong);
+  margin-bottom: 22px;
+}

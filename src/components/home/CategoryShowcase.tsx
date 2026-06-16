@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { HOME_CATEGORIES } from '@/lib/catalog';
 import { CategoryCard } from '@/components/product/CategoryCard';
 import { FilterChips } from '@/components/product/FilterChips';
@@ -12,7 +13,9 @@ export function CategoryShowcase() {
           <h2 className={styles.title}>Explora por categoría</h2>
         </div>
         <div className={styles.chips}>
-          <FilterChips />
+          <Suspense fallback={null}>
+            <FilterChips />
+          </Suspense>
         </div>
         <div className={styles.grid}>
           {HOME_CATEGORIES.map((category) => (

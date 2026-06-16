@@ -1,0 +1,44 @@
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  z-index: 60;
+  background: var(--graphite-950);
+  color: #fff;
+  padding: 13px 22px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-pop);
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  animation: dmw-toast 0.26s var(--ease-out);
+  max-width: calc(100vw - 32px);
+}
+
+.check {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--green-500);
+  color: #fff;
+  font-size: 11px;
+  flex: 0 0 auto;
+}
+
+.cta {
+  margin-left: 5px;
+  padding-left: 13px;
+  border-left: 1px solid rgba(255, 255, 255, 0.22);
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+  background: transparent;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}

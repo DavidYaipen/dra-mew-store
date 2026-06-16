@@ -1,0 +1,64 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    filter var(--dur-fast) var(--ease-out);
+  white-space: nowrap;
+}
+
+.button:active {
+  transform: scale(0.96);
+}
+
+.button:disabled {
+  opacity: 0.45;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Variantes */
+.primary {
+  background: var(--brand);
+  color: #fff;
+  box-shadow: var(--glow-accent-soft);
+}
+.primary:hover:not(:disabled) {
+  box-shadow: var(--glow-accent);
+  transform: translateY(-2px);
+}
+
+.secondary {
+  background: #fff;
+  color: var(--text-strong);
+  border: 1px solid var(--border-strong);
+}
+.secondary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Tamaños */
+.md {
+  height: 48px;
+  padding: 0 22px;
+  font-size: 15px;
+}
+.lg {
+  height: 54px;
+  padding: 0 26px;
+  border-radius: var(--radius-lg);
+  font-size: 16px;
+}
+
+.fullWidth {
+  width: 100%;
+}

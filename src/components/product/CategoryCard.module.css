@@ -1,0 +1,48 @@
+.wrap {
+  position: relative;
+  display: block;
+  height: 220px;
+  border-radius: 22px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.28s var(--ease-out);
+}
+.wrap:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.imageCard {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transition: transform 0.4s var(--ease-out);
+}
+.wrap:hover .imageCard {
+  transform: scale(1.06);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 45%, rgba(14, 15, 18, 0.55) 100%);
+}
+
+.label {
+  position: absolute;
+  left: 18px;
+  bottom: 16px;
+  color: #fff;
+}
+
+.name {
+  font-weight: 700;
+  font-size: 17px;
+}
+
+.count {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  opacity: 0.85;
+}

@@ -1,0 +1,134 @@
+.hero {
+  position: relative;
+  padding: 72px 48px 60px;
+  background:
+    radial-gradient(120% 95% at 80% 8%, var(--pink-wash) 0%, rgba(255, 255, 255, 0) 52%),
+    linear-gradient(180deg, #fff 0%, var(--graphite-50) 100%);
+  overflow: hidden;
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: 1.04fr 1fr;
+  gap: 48px;
+  align-items: center;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #b32440;
+  background: var(--pink-soft);
+  padding: 7px 14px;
+  border-radius: 999px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 66px;
+  line-height: 1.03;
+  letter-spacing: -0.01em;
+  color: var(--text-strong);
+  margin-top: 20px;
+}
+.accent {
+  color: var(--brand);
+  font-style: italic;
+}
+
+.subtitle {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  max-width: 440px;
+  margin-top: 18px;
+}
+
+.ctas {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 26px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.mono {
+  font-family: var(--font-mono);
+  color: var(--text-body);
+}
+.statDot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--graphite-300);
+}
+
+.art {
+  position: relative;
+}
+
+.stage {
+  position: relative;
+  aspect-ratio: 4 / 3.3;
+  border-radius: 28px;
+  background: radial-gradient(120% 120% at 50% 35%, var(--pink-wash), var(--graphite-100));
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-lg);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.floatObj {
+  position: absolute;
+  display: block;
+}
+.float1 {
+  top: 14px;
+  right: -24px;
+  --obj-rot: 8deg;
+  animation: ui-float 6.4s var(--ease-in-out) infinite;
+}
+.float2 {
+  bottom: -18px;
+  left: 24px;
+  --obj-rot: -6deg;
+  animation: ui-float 5.1s var(--ease-in-out) infinite;
+}
+.float3 {
+  bottom: 30px;
+  right: -18px;
+  --obj-rot: 12deg;
+  animation: ui-float 6.9s var(--ease-in-out) infinite;
+}
+
+@media (max-width: 900px) {
+  .inner {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .title {
+    font-size: 46px;
+  }
+  .hero {
+    padding: 48px 20px 40px;
+  }
+}

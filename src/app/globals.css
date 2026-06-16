@@ -1,0 +1,292 @@
+/* ============================================================
+   Dra. Mew Store — tokens globales
+   Portado del design system "Universal Identity"
+   (tokens/colors.css · typography.css · spacing.css · base.css)
+   más las variables locales del prototipo (acento rosa).
+   Las familias de fuente se inyectan vía next/font en layout.tsx
+   (--font-manrope / --font-instrument / --font-mono).
+   ============================================================ */
+
+:root {
+  /* — Pure — */
+  --white: #ffffff;
+  --black: #000000;
+
+  /* — Graphite (neutral scale) — */
+  --graphite-950: #0e0f12;
+  --graphite-900: #16181c;
+  --graphite-800: #1e2127;
+  --graphite-700: #2c2f36;
+  --graphite-600: #474b54;
+  --graphite-500: #6b7280;
+  --graphite-400: #9aa0ab;
+  --graphite-300: #c4c9d2;
+  --graphite-200: #e2e5ea;
+  --graphite-150: #e9ecf0;
+  --graphite-100: #eef0f3;
+  --graphite-50: #f6f7f9;
+
+  /* — Deep Blue (brand accent scale) — */
+  --blue-950: #0a1733;
+  --blue-900: #102a5c;
+  --blue-800: #163a7e;
+  --blue-700: #1c3f8f; /* brand — azul profundo */
+  --blue-600: #2452b8;
+  --blue-500: #2c5ce6; /* interactive primary */
+  --blue-400: #5781f0;
+  --blue-300: #93aef7;
+  --blue-200: #c3d2fb;
+  --blue-100: #e3eafd;
+  --blue-50: #f1f5ff;
+
+  /* — Support hues (used sparingly, derived from object icons) — */
+  --violet-500: #7c5cff;
+  --violet-100: #ece7ff;
+  --amber-500: #f5a524;
+  --amber-100: #fdeccc;
+  --rose-500: #f24f6e;
+  --rose-100: #fde2e7;
+  --green-500: #1f9d66;
+  --green-100: #d8f3e5;
+
+  /* ---------- Semantic aliases ---------- */
+  --brand: var(--blue-700);
+  --brand-strong: var(--blue-800);
+  --accent: var(--blue-500);
+  --accent-hover: var(--blue-600);
+  --accent-soft: var(--blue-50);
+  --accent-soft-2: var(--blue-100);
+
+  --text-strong: var(--graphite-950);
+  --text-body: var(--graphite-800);
+  --text-muted: var(--graphite-500);
+  --text-faint: var(--graphite-400);
+  --text-on-accent: var(--white);
+  --text-link: var(--blue-500);
+
+  --surface-canvas: var(--graphite-50);
+  --surface-card: var(--white);
+  --surface-sunken: var(--graphite-100);
+  --surface-hover: var(--graphite-50);
+  --surface-inverse: var(--graphite-950);
+
+  --border-subtle: rgba(14, 15, 18, 0.07);
+  --border-soft: rgba(14, 15, 18, 0.1);
+  --border-strong: rgba(14, 15, 18, 0.16);
+  --border-accent: var(--blue-300);
+
+  /* Glassmorphism (light, iOS frosted) */
+  --glass-fill: rgba(255, 255, 255, 0.62);
+  --glass-fill-strong: rgba(255, 255, 255, 0.78);
+  --glass-stroke: rgba(255, 255, 255, 0.7);
+  --glass-hairline: rgba(14, 15, 18, 0.06);
+
+  /* Status */
+  --success: var(--green-500);
+  --warning: var(--amber-500);
+  --danger: var(--rose-500);
+
+  /* Cosmic field — subtle background washes for hero */
+  --field-1: #f6f7f9;
+  --field-2: #eef2fb;
+  --field-glow: rgba(44, 92, 230, 0.1);
+
+  /* ---------- Tipografía ---------- */
+  --font-sans: var(--font-manrope), -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui,
+    sans-serif;
+  --font-display: var(--font-instrument), 'Manrope', Georgia, serif;
+  --font-mono: var(--font-mono-jb), ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --fw-light: 300;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-extra: 800;
+
+  --text-2xs: 0.6875rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-md: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 1.875rem;
+  --text-3xl: 2.375rem;
+  --text-4xl: 3rem;
+  --text-5xl: 3.75rem;
+  --text-6xl: 4.75rem;
+
+  --leading-tight: 1.05;
+  --leading-snug: 1.18;
+  --leading-normal: 1.4;
+  --leading-relaxed: 1.6;
+
+  --tracking-tighter: -0.03em;
+  --tracking-tight: -0.018em;
+  --tracking-normal: -0.006em;
+  --tracking-wide: 0.04em;
+  --tracking-caps: 0.14em;
+
+  /* ---------- Spacing / radii / shadows / motion ---------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --radius-2xl: 36px;
+  --radius-3xl: 44px;
+  --radius-full: 999px;
+
+  --shadow-xs: 0 1px 2px rgba(14, 15, 18, 0.05);
+  --shadow-sm: 0 1px 2px rgba(14, 15, 18, 0.04), 0 2px 6px rgba(14, 15, 18, 0.05);
+  --shadow-md: 0 2px 4px rgba(14, 15, 18, 0.04), 0 8px 18px rgba(14, 15, 18, 0.07);
+  --shadow-lg: 0 4px 10px rgba(14, 15, 18, 0.05), 0 18px 40px rgba(14, 15, 18, 0.1);
+  --shadow-xl: 0 10px 24px rgba(14, 15, 18, 0.07), 0 32px 70px rgba(14, 15, 18, 0.14);
+  --shadow-card: 0 1px 1px rgba(14, 15, 18, 0.04), 0 6px 20px rgba(14, 15, 18, 0.06);
+  --shadow-pop: 0 12px 30px rgba(14, 15, 18, 0.12), 0 2px 6px rgba(14, 15, 18, 0.06);
+  --shadow-glass: 0 8px 30px rgba(14, 15, 18, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  --glow-accent: 0 8px 28px rgba(44, 92, 230, 0.28);
+  --glow-accent-soft: 0 6px 22px rgba(44, 92, 230, 0.16);
+
+  --shadow-object: 0 18px 30px rgba(14, 15, 18, 0.16);
+  --shadow-object-sm: 0 8px 16px rgba(14, 15, 18, 0.14);
+
+  --blur-sm: 8px;
+  --blur-md: 18px;
+  --blur-lg: 30px;
+  --blur-xl: 48px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 140ms;
+  --dur-base: 240ms;
+  --dur-slow: 420ms;
+  --dur-float: 6s;
+
+  --content-max: 1200px;
+
+  /* ---------- Acento local de Dra. Mew Store (rosa) ---------- */
+  --pink: #f56fa1;
+  --pink-soft: #ffe6ef;
+  --pink-wash: #fff5f8;
+  --pink-200: #ffd0e0;
+  --pink-deep: #e24f87;
+}
+
+/* ============================================================
+   Base reset & document defaults
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  letter-spacing: var(--tracking-normal);
+  color: var(--text-body);
+  background: #fff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  min-height: 100vh;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure {
+  margin: 0;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+img {
+  display: block;
+  max-width: 100%;
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+::selection {
+  background: var(--blue-200);
+  color: var(--graphite-950);
+}
+
+/* ============================================================
+   Keyframes
+   ============================================================ */
+@keyframes ui-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--obj-rot, 0deg));
+  }
+  50% {
+    transform: translateY(-10px) rotate(var(--obj-rot, 0deg));
+  }
+}
+@keyframes dmw-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes dmw-toast {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

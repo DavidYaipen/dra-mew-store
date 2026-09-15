@@ -33,6 +33,7 @@ describe('CATALOG', () => {
   });
 
   it('todas las imágenes apuntan a una ruta pública', () => {
-    expect(CATALOG.every((p) => p.image.startsWith('/'))).toBe(true);
+    // Acepta rutas locales (/assets/...) o URLs de Supabase Storage (https://...supabase.co/storage/...)
+    expect(CATALOG.every((p) => p.image.startsWith('/') || p.image.startsWith('https://'))).toBe(true);
   });
 });

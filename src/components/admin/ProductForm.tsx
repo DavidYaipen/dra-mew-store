@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 const CATEGORIES = ['Peluches', 'Figuras', 'Cartas', 'Ropa', 'Accesorios'];
 const TINTS: Record<string, string> = {
@@ -16,6 +16,54 @@ export function ProductForm({ initialData }: { initialData?: Record<string, unkn
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [imagePreview, setImagePreview] = useState<string>((initialData?.image as string) || '');
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = async (file: File) => {
+    setUploading(true);
+    setError('');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      if (initialData?.id) {
+        formData.append('productId', String(initialData.id));
+      }
+
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || 'Error al subir imagen');
+        return;
+      }
+
+      const data = await res.json();
+      setImagePreview(data.url);
+    } catch {
+      setError('Error de conexion al subir imagen');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Preview local
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setImagePreview(ev.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+      // Subir a Supabase
+      handleImageUpload(file);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,7 +78,7 @@ export function ProductForm({ initialData }: { initialData?: Record<string, unkn
       price: Number(form.get('price')),
       old_price: form.get('old_price') ? Number(form.get('old_price')) : null,
       rating: Number(form.get('rating')),
-      image: form.get('image'),
+      image: imagePreview || form.get('image'),
       tint: form.get('tint'),
       badge: form.get('badge') || null,
       is_featured: form.get('is_featured') === 'on',
@@ -128,9 +176,77 @@ export function ProductForm({ initialData }: { initialData?: Record<string, unkn
         </div>
       </div>
 
+      {/* Image Upload Section */}
       <div className="form-group">
-        <label htmlFor="image">URL de imagen</label>
-        <input id="image" name="image" type="text" defaultValue={initialData?.image as string || '/assets/thiings/star.png'} placeholder="/assets/thiings/star.png" required />
+        <label>Imagen del producto</label>
+        <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+          {/* Preview */}
+          <div
+            style={{
+              width: 120,
+              height: 120,
+              border: '2px dashed var(--graphite-200)',
+              borderRadius: 12,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'hidden',
+              background: 'var(--graphite-50)',
+              flexShrink: 0,
+            }}
+          >
+            {imagePreview ? (
+              <img
+                src={imagePreview}
+                alt="Preview"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <span style={{ fontSize: 12, color: 'var(--text-faint)', textAlign: 'center', padding: 8 }}>
+                Sin imagen
+              </span>
+            )}
+          </div>
+
+          {/* Upload controls */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+            />
+            <button
+              type="button"
+              className="admin-btn"
+              data-variant="secondary"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+            >
+              {uploading ? 'Subiendo...' : 'Seleccionar imagen'}
+            </button>
+            <div style={{ fontSize: 12, color: 'var(--text-faint)' }}>
+              JPEG, PNG, WebP o GIF. Max 5MB.
+            </div>
+
+            {/* Manual URL input */}
+            <div style={{ marginTop: 8 }}>
+              <label htmlFor="image" style={{ fontSize: 13, color: 'var(--graphite-600)', marginBottom: 4, display: 'block' }}>
+                O ingresa URL manualmente:
+              </label>
+              <input
+                id="image"
+                name="image"
+                type="text"
+                value={imagePreview}
+                onChange={(e) => setImagePreview(e.target.value)}
+                placeholder="https://..."
+                style={{ width: '100%' }}
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="form-group">
@@ -150,7 +266,7 @@ export function ProductForm({ initialData }: { initialData?: Record<string, unkn
         <button type="button" className="admin-btn" data-variant="secondary" onClick={() => router.back()}>
           Cancelar
         </button>
-        <button type="submit" className="admin-btn" data-variant="primary" disabled={loading}>
+        <button type="submit" className="admin-btn" data-variant="primary" disabled={loading || uploading}>
           {loading ? 'Guardando...' : initialData?.id ? 'Actualizar' : 'Crear producto'}
         </button>
       </div>

@@ -84,12 +84,15 @@ export interface CategoryCount {
   tint: string;
 }
 
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://gqlsmnscpmvymxzrrorx.supabase.co';
+const img = (file: string) => `${SUPABASE_URL}/storage/v1/object/public/products/${file}`;
+
 const CATEGORY_META: Record<Category, { image: string; tint: string }> = {
-  Peluches: { image: '/assets/thiings/star.png', tint: 'var(--pink-soft)' },
-  Figuras: { image: '/assets/thiings/lightning.png', tint: 'var(--blue-100)' },
-  Cartas: { image: '/assets/thiings/five-star.png', tint: 'var(--violet-100)' },
-  Ropa: { image: '/assets/thiings/like.png', tint: 'var(--amber-100)' },
-  Accesorios: { image: '/assets/thiings/console.png', tint: 'var(--graphite-100)' },
+  Peluches: { image: img('star.png'), tint: 'var(--pink-soft)' },
+  Figuras: { image: img('lightning.png'), tint: 'var(--blue-100)' },
+  Cartas: { image: img('five-star.png'), tint: 'var(--violet-100)' },
+  Ropa: { image: img('like.png'), tint: 'var(--amber-100)' },
+  Accesorios: { image: img('console.png'), tint: 'var(--graphite-100)' },
 };
 
 export const getCategoryCounts = cache(async (): Promise<CategoryCount[]> => {

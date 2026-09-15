@@ -12,7 +12,7 @@ interface ProductImageProps {
 
 /**
  * Imagen de producto. Envuelve next/image y aplica la sombra "object" del DS.
- * Sirve igual para los placeholders 3D que para fotos reales en /products.
+ * Soporta imagenes locales y de Supabase Storage.
  */
 export function ProductImage({
   src,
@@ -21,6 +21,26 @@ export function ProductImage({
   shadow = '0 14px 20px rgba(14,15,18,.18)',
   priority = false,
 }: ProductImageProps) {
+  // Si es una URL externa (Supabase Storage), usar img nativo
+  if (src.startsWith('http')) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={src}
+        alt={alt}
+        width={size}
+        height={size}
+        style={{
+          width: size,
+          height: size,
+          objectFit: 'contain',
+          filter: `drop-shadow(${shadow})`,
+        }}
+      />
+    );
+  }
+
+  // Para imagenes locales, usar next/image
   return (
     <Image
       src={src}

@@ -8,6 +8,9 @@ export interface BlogPost {
   category: string;
 }
 
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://gqlsmnscpmvymxzrrorx.supabase.co';
+const img = (file: string) => `${SUPABASE_URL}/storage/v1/object/public/products/${file}`;
+
 export const BLOG_POSTS: BlogPost[] = [
   {
     slug: 'top-5-peluches-pokemon-2026',
@@ -27,7 +30,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <h3>5. Peluche Gengar</h3>
 <p>Para los fans del tipo fantasma. Con su sonrisa traviesa y su color púrpura intenso, Gengar es un must para completar la colección.</p>
 <p>¿Ya tienes alguno en tu lista de deseos? ¡Añádelo al carrito antes de que se agoten!</p>`,
-    image: '/assets/thiings/star.png',
+    image: img('star.png'),
     category: 'Coleccionismo',
   },
   {
@@ -46,7 +49,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <h3>Cajas Élite Trainer</h3>
 <p>Si quieres ir más allá, una caja Élite Trainer incluye sobres, dados, marcadores de daño y todo lo necesario para jugar. Perfecta para regalar o para empezar en serio.</p>
 <p>Visita nuestra sección de <a href="/productos?cat=Cartas">Cartas</a> para ver todos los productos disponibles.</p>`,
-    image: '/assets/thiings/five-star.png',
+    image: img('five-star.png'),
     category: 'Guías',
   },
   {
@@ -65,7 +68,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <h3>Almacenaje original</h3>
 <p>Si eres coleccionista serio, conserva las cajas y el embalaje original. Las figuras "caja cerrada" tienen un valor significativamente mayor en el mercado de segunda mano.</p>
 <p>En Dra. Mew Store enviamos todas nuestras figuras con embalaje protector reforzado para que lleguen en perfecto estado.</p>`,
-    image: '/assets/thiings/shield.png',
+    image: img('shield.png'),
     category: 'Consejos',
   },
   {
@@ -84,7 +87,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <h3>Ofertas de temporada</h3>
 <p>Durante todo septiembre tendrás envío gratis en pedidos superiores a S/ 150. Además, hemos preparado descuentos exclusivos en artículos seleccionados.</p>
 <p>¡No dejes pasar la oportunidad! Visita nuestra <a href="/productos">tienda</a> y descubre todas las novedades.</p>`,
-    image: '/assets/thiings/lightning.png',
+    image: img('lightning.png'),
     category: 'Novedades',
   },
   {
@@ -103,7 +106,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <h3>Para quienes buscan algo único</h3>
 <p>Las cartas raras (como la Mew ex) son piezas de colección con valor sentimental y económico. Un regalo que recordarán siempre.</p>
 <p>En Dra. Mew Store encontrarás regalos para todos los presupuestos, desde S/ 39.90 hasta piezas premium. ¡Empieza a planificar tu lista!</p>`,
-    image: '/assets/thiings/heart.png',
+    image: img('heart.png'),
     category: 'Regalos',
   },
 ];

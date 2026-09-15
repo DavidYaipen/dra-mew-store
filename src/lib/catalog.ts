@@ -9,19 +9,19 @@ const ph = (file: string) => `/assets/thiings/${file}`;
  * Los `image` son placeholders intercambiables por fotos reales.
  */
 export const CATALOG: Product[] = [
-  { id: 1, name: 'Peluche Mew 30 cm', cat: 'Peluches', price: 34.99, rating: 4.9, image: ph('star.png'), tint: 'var(--pink-soft)', badge: 'Nuevo' },
-  { id: 2, name: 'Peluche Pikachu', cat: 'Peluches', price: 29.99, oldPrice: 39.99, rating: 4.8, image: ph('heart.png'), tint: 'var(--blue-50)' },
-  { id: 3, name: 'Peluche Snorlax XL', cat: 'Peluches', price: 49.99, rating: 5.0, image: ph('golden-heart.png'), tint: 'var(--amber-100)', badge: 'Nuevo' },
-  { id: 4, name: 'Figura Charizard', cat: 'Figuras', price: 59.99, rating: 5.0, image: ph('lightning.png'), tint: 'var(--rose-100)', badge: 'Nuevo' },
-  { id: 5, name: 'Figura Bulbasaur', cat: 'Figuras', price: 24.99, oldPrice: 32.99, rating: 4.7, image: ph('peace.png'), tint: 'var(--green-100)' },
-  { id: 6, name: 'Figura Gengar', cat: 'Figuras', price: 39.99, rating: 4.9, image: ph('purple-heart.png'), tint: 'var(--violet-100)', badge: 'Nuevo' },
-  { id: 7, name: 'Booster 151', cat: 'Cartas', price: 6.99, rating: 4.7, image: ph('five-star.png'), tint: 'var(--blue-50)', badge: 'Últimas' },
-  { id: 8, name: 'Caja Élite Trainer', cat: 'Cartas', price: 49.99, rating: 5.0, image: ph('medal.png'), tint: 'var(--amber-100)' },
-  { id: 9, name: 'Carta Mew ex', cat: 'Cartas', price: 89.99, rating: 4.9, image: ph('award.png'), tint: 'var(--pink-soft)', badge: 'Rara' },
-  { id: 10, name: 'Camiseta Pokémon', cat: 'Ropa', price: 24.99, oldPrice: 34.99, rating: 4.6, image: ph('like.png'), tint: 'var(--blue-50)' },
-  { id: 11, name: 'Gorra Pokéball', cat: 'Ropa', price: 19.99, oldPrice: 27.99, rating: 4.5, image: ph('love.png'), tint: 'var(--rose-100)' },
-  { id: 12, name: 'Funda para consola', cat: 'Accesorios', price: 14.99, rating: 4.4, image: ph('console.png'), tint: 'var(--graphite-100)' },
-  { id: 13, name: 'Llavero Pikachu', cat: 'Accesorios', price: 9.99, rating: 4.6, image: ph('eighth-note.png'), tint: 'var(--violet-100)' },
+  { id: 1, name: 'Peluche Mew 30 cm', cat: 'Peluches', price: 34.99, rating: 4.9, image: ph('star.png'), tint: 'var(--pink-soft)', badge: 'Nuevo', description: 'Peluche coleccion oficial de Pokemon. Acabado premium con materiales de alta calidad.', dimensions: '30 x 20 x 15 cm', material: 'Poliéster suave, relleno de algodón', origin: 'official' },
+  { id: 2, name: 'Peluche Pikachu', cat: 'Peluches', price: 29.99, oldPrice: 39.99, rating: 4.8, image: ph('heart.png'), tint: 'var(--blue-50)', description: 'Peluche clasico de Pikachu. Suave y abrazable, ideal para fans de todas las edades.', dimensions: '25 x 15 x 12 cm', material: 'Poliéster suave', origin: 'official' },
+  { id: 3, name: 'Peluche Snorlax XL', cat: 'Peluches', price: 49.99, rating: 5.0, image: ph('golden-heart.png'), tint: 'var(--amber-100)', badge: 'Nuevo', description: 'Peluche gigante de Snorlax. Perfecto para acurrucarse y dormir.', dimensions: '50 x 40 x 30 cm', material: 'Poliéster suave, relleno premium', origin: 'official' },
+  { id: 4, name: 'Figura Charizard', cat: 'Figuras', price: 59.99, rating: 5.0, image: ph('lightning.png'), tint: 'var(--rose-100)', badge: 'Nuevo', description: 'Figura coleccion de alto detalle. Edicion cuidada al detalle, perfecta para exhibir.', dimensions: '18 x 15 x 10 cm', material: 'PVC de alta calidad', origin: 'official' },
+  { id: 5, name: 'Figura Bulbasaur', cat: 'Figuras', price: 24.99, oldPrice: 32.99, rating: 4.7, image: ph('peace.png'), tint: 'var(--green-100)', description: 'Figura detallada de Bulbasaur con su planta en la espalda.', dimensions: '12 x 8 x 8 cm', material: 'PVC', origin: 'official' },
+  { id: 6, name: 'Figura Gengar', cat: 'Figuras', price: 39.99, rating: 4.9, image: ph('purple-heart.png'), tint: 'var(--violet-100)', badge: 'Nuevo', description: 'Figura de Gengar con expresion espeluznante. Perfecta para coleccionistas.', dimensions: '14 x 10 x 10 cm', material: 'PVC de alta calidad', origin: 'official' },
+  { id: 7, name: 'Booster 151', cat: 'Cartas', price: 6.99, rating: 4.7, image: ph('five-star.png'), tint: 'var(--blue-50)', badge: 'Últimas', description: 'Sobre de cartas con 10 cartas aleatorias de la edicion 151.', dimensions: '8.6 x 6.3 cm (por carta)', material: 'Cartulina laminada', origin: 'official' },
+  { id: 8, name: 'Caja Élite Trainer', cat: 'Cartas', price: 49.99, rating: 5.0, image: ph('medal.png'), tint: 'var(--amber-100)', description: 'Caja completa con sobres, dados,Tokens y accesorios para jugar.', dimensions: '25 x 18 x 5 cm', material: 'Cartulina y plastico', origin: 'official' },
+  { id: 9, name: 'Carta Mew ex', cat: 'Cartas', price: 89.99, rating: 4.9, image: ph('award.png'), tint: 'var(--pink-soft)', badge: 'Rara', description: 'Carta holografica rara de Mew ex. Edicion limitada.', dimensions: '8.6 x 6.3 cm', material: 'Cartulina holografica', origin: 'official' },
+  { id: 10, name: 'Camiseta Pokémon', cat: 'Ropa', price: 24.99, oldPrice: 34.99, rating: 4.6, image: ph('like.png'), tint: 'var(--blue-50)', description: 'Camiseta comoda con estampado de Pokemon. Diseno exclusivo.', dimensions: 'Ver guia de tallas', material: 'Algodón 60% / Poliéster 40%', origin: 'generic' },
+  { id: 11, name: 'Gorra Pokéball', cat: 'Ropa', price: 19.99, oldPrice: 27.99, rating: 4.5, image: ph('love.png'), tint: 'var(--rose-100)', description: 'Gorra con diseno de Pokéball. Ajustable y comoda.', dimensions: 'Ajustable', material: 'Algodón / Poliéster', origin: 'generic' },
+  { id: 12, name: 'Funda para consola', cat: 'Accesorios', price: 14.99, rating: 4.4, image: ph('console.png'), tint: 'var(--graphite-100)', description: 'Funda protectora para consola portatil con diseno Pokemon.', dimensions: 'Compatible con Switch Lite', material: 'Neoprene', origin: 'generic' },
+  { id: 13, name: 'Llavero Pikachu', cat: 'Accesorios', price: 9.99, rating: 4.6, image: ph('eighth-note.png'), tint: 'var(--violet-100)', description: 'Llavero metalico con silueta de Pikachu. Resistente y elegante.', dimensions: '5 x 3 x 0.5 cm', material: 'Metal aleacion', origin: 'generic' },
 ];
 
 export function getProduct(id: number): Product | undefined {

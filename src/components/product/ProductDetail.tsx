@@ -59,9 +59,37 @@ export function ProductDetail({ product }: { product: Product }) {
         </div>
 
         <p className={styles.description}>
-          Pieza de colección oficial con acabado premium y materiales de alta calidad. Edición
-          cuidada al detalle, ideal para regalar o sumar a tu universo Pokémon.
+          {product.description || 'Pieza de colección oficial con acabado premium y materiales de alta calidad. Edición cuidada al detalle, ideal para regalar o sumar a tu universo Pokémon.'}
         </p>
+
+        {/* Especificaciones del producto */}
+        {(product.dimensions || product.material || product.origin) && (
+          <div className={styles.specs}>
+            <h3 className={styles.specsTitle}>Especificaciones</h3>
+            <ul className={styles.specsList}>
+              {product.dimensions && (
+                <li>
+                  <span className={styles.specLabel}>Dimensiones:</span>
+                  <span>{product.dimensions}</span>
+                </li>
+              )}
+              {product.material && (
+                <li>
+                  <span className={styles.specLabel}>Material:</span>
+                  <span>{product.material}</span>
+                </li>
+              )}
+              {product.origin && (
+                <li>
+                  <span className={styles.specLabel}>Origen:</span>
+                  <span className={styles.originBadge} data-origin={product.origin}>
+                    {product.origin === 'official' ? 'Pokémon Center (Oficial)' : 'Genérico'}
+                  </span>
+                </li>
+              )}
+            </ul>
+          </div>
+        )}
 
         <div className={styles.actions}>
           <div className={styles.qty}>

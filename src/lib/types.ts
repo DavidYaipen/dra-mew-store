@@ -24,6 +24,14 @@ export interface Product {
   badge?: string;
   /** Stock total (sumatoria de variantes o stock directo). */
   stock?: number;
+  /** Descripción detallada del producto. */
+  description?: string;
+  /** Dimensiones: alto x ancho x profundidad. */
+  dimensions?: string;
+  /** Material del producto. */
+  material?: string;
+  /** Origen: official (Pokemon Center) o generic. */
+  origin?: 'official' | 'generic';
 }
 
 export interface ProductVariant {

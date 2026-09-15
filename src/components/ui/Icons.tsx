@@ -59,8 +59,11 @@ export function CartIcon(props: IconProps) {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M6 8h12l-1.1 11.2a1.5 1.5 0 0 1-1.5 1.3H8.6a1.5 1.5 0 0 1-1.5-1.3L6 8z" />
-      <path d="M9 8a3 3 0 0 1 6 0" />
+      {/* Pokeball icon */}
+      <circle cx="12" cy="12" r="10" />
+      <path d="M2 12h20" />
+      <circle cx="12" cy="12" r="3" fill="currentColor" />
+      <path d="M12 2a10 10 0 0 1 0 20" fill="none" />
     </svg>
   );
 }

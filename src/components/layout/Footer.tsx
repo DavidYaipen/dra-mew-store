@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useStore } from '@/store/useStore';
-import { STORE_NAME } from '@/lib/constants';
+import { STORE_NAME, WHATSAPP_PHONE } from '@/lib/constants';
 import { Logo } from './Logo';
 import { ArrowRightIcon, FacebookIcon, InstagramIcon, YoutubeIcon } from '@/components/ui/Icons';
 import styles from './Footer.module.css';
@@ -18,6 +18,16 @@ export function Footer() {
           <p className={styles.tagline}>
             Coleccionables Pokémon originales para fans de todas las edades.
           </p>
+          <div className={styles.contactInfo}>
+            <a
+              href={`https://wa.me/${WHATSAPP_PHONE}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.contactLink}
+            >
+              📱 WhatsApp: +51 975 625 359
+            </a>
+          </div>
           <div className={styles.social}>
             <span className={styles.socialBtn} aria-hidden>
               <FacebookIcon size={16} />

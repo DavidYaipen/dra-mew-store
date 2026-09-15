@@ -15,6 +15,10 @@ export interface Database {
           tint: string;
           badge: string | null;
           is_featured: boolean;
+          description: string | null;
+          dimensions: string | null;
+          material: string | null;
+          origin: string | null;
           created_at: string;
         };
         Insert: {
@@ -28,6 +32,10 @@ export interface Database {
           tint: string;
           badge?: string | null;
           is_featured?: boolean;
+          description?: string | null;
+          dimensions?: string | null;
+          material?: string | null;
+          origin?: string | null;
           created_at?: string;
         };
         Update: {
@@ -41,6 +49,10 @@ export interface Database {
           tint?: string;
           badge?: string | null;
           is_featured?: boolean;
+          description?: string | null;
+          dimensions?: string | null;
+          material?: string | null;
+          origin?: string | null;
           created_at?: string;
         };
       };

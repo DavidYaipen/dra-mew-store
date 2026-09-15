@@ -252,6 +252,31 @@
   font-size: 24px;
 }
 
+.orderNumber {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 16px 0;
+  padding: 16px 24px;
+  background: var(--graphite-50);
+  border-radius: 12px;
+}
+
+.orderLabel {
+  font-size: 12px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.orderId {
+  font-size: 28px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--graphite-900);
+}
+
 .total {
   font-size: 20px;
   font-weight: 700;

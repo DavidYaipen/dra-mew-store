@@ -113,10 +113,14 @@ export default function CheckoutPage() {
       <div className={styles.page}>
         <div className={styles.result}>
           <div className={styles.checkIcon}>✓</div>
-          <h1>¡Pedido #{result.order_number} confirmado!</h1>
+          <h1>¡Pedido confirmado!</h1>
+          <div className={styles.orderNumber}>
+            <span className={styles.orderLabel}>Número de pedido</span>
+            <span className={styles.orderId}>OR-{String(result.order_number).padStart(6, '0')}</span>
+          </div>
           <p className={styles.total}>Total: {formatPrice(result.total)}</p>
           <p className={styles.note} style={{ marginBottom: 16 }}>
-            Redirigiendo a WhatsApp...
+            Redirigiendo a WhatsApp para confirmar tu pedido...
           </p>
           <a
             href={result.whatsapp_url}
@@ -124,10 +128,10 @@ export default function CheckoutPage() {
             rel="noopener noreferrer"
             className={styles.whatsappBtn}
           >
-            Si no se abrió, haz clic aquí para enviar por WhatsApp
+            Enviar pedido por WhatsApp
           </a>
           <p className={styles.note}>
-            También puedes buscar tu pedido con el número #{result.order_number} y tu email.
+            Guarda tu número de pedido para hacer seguimiento.
           </p>
         </div>
       </div>

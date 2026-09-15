@@ -1,10 +1,9 @@
 'use client';
 
-import { formatEuro } from '@/lib/format';
+import { formatPrice } from '@/lib/format';
+import { WHATSAPP_PHONE } from '@/lib/constants';
 import { useStore } from '@/store/useStore';
 import styles from './WhatsAppOrder.module.css';
-
-const STORE_PHONE = '34600000000';
 
 export function WhatsAppOrder() {
   const { cart, getProduct, subtotal } = useStore();
@@ -14,7 +13,7 @@ export function WhatsAppOrder() {
   const lines = cart.map((line) => {
     const product = getProduct(line.id);
     if (!product) return null;
-    return `• ${product.name} x${line.qty} — ${formatEuro(product.price * line.qty)}`;
+    return `• ${product.name} x${line.qty} — ${formatPrice(product.price * line.qty)}`;
   }).filter(Boolean);
 
   const message = [
@@ -22,12 +21,12 @@ export function WhatsAppOrder() {
     '',
     ...lines,
     '',
-    `Total: ${formatEuro(subtotal)}`,
+    `Total: ${formatPrice(subtotal)}`,
     '',
     'Quisiera confirmar disponibilidad y método de pago. Gracias!',
   ].join('\n');
 
-  const url = `https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(message)}`;
+  const url = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
 
   return (
     <a

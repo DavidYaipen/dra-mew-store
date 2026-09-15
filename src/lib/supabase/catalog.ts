@@ -13,6 +13,10 @@ interface ProductRow {
   tint: string;
   badge: string | null;
   is_featured: boolean;
+  description: string | null;
+  dimensions: string | null;
+  material: string | null;
+  origin: string | null;
 }
 
 function rowToProduct(row: ProductRow): Product {
@@ -26,6 +30,10 @@ function rowToProduct(row: ProductRow): Product {
     image: row.image,
     tint: row.tint,
     badge: row.badge ?? undefined,
+    description: row.description ?? undefined,
+    dimensions: row.dimensions ?? undefined,
+    material: row.material ?? undefined,
+    origin: (row.origin as 'official' | 'generic') ?? undefined,
   };
 }
 

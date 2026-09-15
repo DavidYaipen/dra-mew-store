@@ -85,12 +85,19 @@
 }
 
 .success {
-  padding: 10px 14px;
+  padding: 12px 14px;
   background: #f0fdf4;
   border: 1px solid #86efac;
   border-radius: 8px;
   color: #16a34a;
   font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.success strong {
+  font-weight: 600;
 }
 
 .links {

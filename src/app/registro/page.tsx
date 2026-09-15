@@ -8,16 +8,18 @@ import styles from './page.module.css';
 export default function RegisterPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; success?: string }>;
+  searchParams: Promise<{ error?: string; success?: string; email?: string }>;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [registeredEmail, setRegisteredEmail] = useState('');
 
   useEffect(() => {
     searchParams.then((p) => {
       if (p.error) setError(decodeURIComponent(p.error));
       if (p.success) setSuccess(p.success);
+      if (p.email) setRegisteredEmail(decodeURIComponent(p.email));
     });
   }, [searchParams]);
 
@@ -49,7 +51,11 @@ export default function RegisterPage({
 
           {success === '1' && (
             <div className={styles.success}>
-              ✓ Cuenta creada. Revisa tu email para confirmar tu cuenta.
+              <strong>✓ Cuenta creada correctamente</strong>
+              <span>
+                Revisa tu correo <strong>{registeredEmail}</strong> para confirmar tu cuenta.
+                Haz clic en el enlace que recibes para poder iniciar sesión.
+              </span>
             </div>
           )}
 

@@ -39,7 +39,16 @@ export async function signup(formData: FormData) {
     redirect('/registro?error=' + encodeURIComponent(error.message));
   }
 
-  redirect('/registro?success=1');
+  redirect('/registro?success=1&email=' + encodeURIComponent(email));
+}
+
+export async function resendConfirmation(email: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
+    email,
+  });
+  return { error: error?.message || null };
 }
 
 export async function logout() {

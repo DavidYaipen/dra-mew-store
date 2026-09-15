@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { login } from '@/lib/supabase/auth';
+import { login, resendConfirmation } from '@/lib/supabase/auth';
 import styles from './page.module.css';
 
 export default function LoginPage({
@@ -12,12 +12,34 @@ export default function LoginPage({
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [resending, setResending] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
+  const [email, setEmail] = useState('');
 
   useEffect(() => {
     searchParams.then((p) => {
       if (p.error) setError(decodeURIComponent(p.error));
     });
   }, [searchParams]);
+
+  const isEmailNotConfirmed = error.toLowerCase().includes('email not confirmed');
+
+  async function handleResend() {
+    if (!email) {
+      setError('Ingresa tu email para reenviar la confirmación');
+      return;
+    }
+    setResending(true);
+    setResendSuccess(false);
+    const { error: resendError } = await resendConfirmation(email);
+    if (resendError) {
+      setError(resendError);
+    } else {
+      setResendSuccess(true);
+      setError('');
+    }
+    setResending(false);
+  }
 
   return (
     <div className={styles.page}>
@@ -32,23 +54,59 @@ export default function LoginPage({
         >
           <div className={styles.field}>
             <label htmlFor="email">Email</label>
-            <input id="email" name="email" type="email" required placeholder="tu@email.com" />
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              placeholder="tu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
           <div className={styles.field}>
             <label htmlFor="password">Contraseña</label>
             <input id="password" name="password" type="password" required placeholder="••••••••" minLength={6} />
           </div>
 
-          {error && <div className={styles.error}>{error}</div>}
+          {error && (
+            <div className={styles.error}>
+              {isEmailNotConfirmed ? (
+                <>
+                  <strong>Tu email no ha sido confirmado.</strong>
+                  <span>Revisa tu bandeja de entrada o spam, o haz clic en reenviar para recibir un nuevo link de confirmación.</span>
+                </>
+              ) : (
+                error
+              )}
+            </div>
+          )}
+
+          {resendSuccess && (
+            <div className={styles.success}>
+              ✓ Email de confirmación reenviado. Revisa tu bandeja de entrada.
+            </div>
+          )}
 
           <button type="submit" className={styles.btn} disabled={loading}>
             {loading ? 'Entrando...' : 'Iniciar sesión'}
           </button>
+
+          {isEmailNotConfirmed && (
+            <button
+              type="button"
+              className={styles.resendBtn}
+              onClick={handleResend}
+              disabled={resending}
+            >
+              {resending ? 'Reenviando...' : 'Reenviar email de confirmación'}
+            </button>
+          )}
         </form>
 
         <div className={styles.links}>
           <Link href="/registro">¿No tienes cuenta? Regístrate</Link>
-          <Link href="/olvido-contraseña">¿Olvidaste tu contraseña?</Link>
+          <Link href="/olvido-contrasena">¿Olvidaste tu contraseña?</Link>
         </div>
       </div>
     </div>

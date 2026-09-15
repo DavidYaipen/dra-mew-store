@@ -1,28 +1,32 @@
 /**
  * Script para migrar imagenes existentes a Supabase Storage
- * 
+ *
  * Ejecutar con: npx tsx scripts/migrate-images.ts
- * 
- * Requiere variables de entorno:
- * - NEXT_PUBLIC_SUPABASE_URL
- * - NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY (service_role key para uploads)
  */
 
 import { createClient } from '@supabase/supabase-js';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as dotenv from 'dotenv';
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SUPABASE_SERVICE_KEY = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
+// Cargar .env.local
+dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 
-if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-  console.error('Missing environment variables');
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  console.error('Faltan variables de entorno en .env.local:');
+  console.error('  NEXT_PUBLIC_SUPABASE_URL');
+  console.error('  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY');
   process.exit(1);
 }
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+console.log(`Supabase URL: ${SUPABASE_URL}\n`);
 
-// Imagenes a migrar (mapeo de archivos locales a nombres en Storage)
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Imagenes a migrar
 const IMAGES_TO_MIGRATE = [
   'star.png',
   'heart.png',
@@ -41,14 +45,14 @@ const IMAGES_TO_MIGRATE = [
 
 async function migrateImages() {
   const publicDir = path.join(process.cwd(), 'public', 'assets', 'thiings');
-  
+
   console.log('Migrando imagenes a Supabase Storage...\n');
 
   for (const filename of IMAGES_TO_MIGRATE) {
     const filePath = path.join(publicDir, filename);
-    
+
     if (!fs.existsSync(filePath)) {
-      console.log(`⚠️  No encontrado: ${filename}`);
+      console.log(`  No encontrado: ${filename}`);
       continue;
     }
 
@@ -71,17 +75,17 @@ async function migrateImages() {
       .from('products')
       .upload(filename, uint8Array, {
         contentType,
-        upsert: true, // Sobrescribir si ya existe
+        upsert: true,
       });
 
     if (error) {
-      console.log(`❌ Error subiendo ${filename}: ${error.message}`);
+      console.log(`  Error subiendo ${filename}: ${error.message}`);
     } else {
       const { data } = supabase.storage
         .from('products')
         .getPublicUrl(filename);
-      
-      console.log(`✅ ${filename} → ${data.publicUrl}`);
+
+      console.log(`  ${filename} -> ${data.publicUrl}`);
     }
   }
 

@@ -22,8 +22,10 @@ const NAV_ITEMS = [
   { href: '/admin/inventario', label: 'Inventario', icon: BoxIcon },
 ];
 
-export function AdminSidebar() {
+export function AdminSidebar({ email }: { email?: string }) {
   const pathname = usePathname();
+  const displayName = email ? email.split('@')[0] : 'Admin';
+  const initial = displayName.charAt(0).toUpperCase();
 
   return (
     <aside className="admin-sidebar">
@@ -55,10 +57,10 @@ export function AdminSidebar() {
 
       <div className="sidebar-footer">
         <div className="sidebar-user">
-          <div className="sidebar-avatar">A</div>
+          <div className="sidebar-avatar">{initial}</div>
           <div className="sidebar-user-info">
-            <div className="sidebar-user-name">Admin</div>
-            <div className="sidebar-user-email">dra.mew.store</div>
+            <div className="sidebar-user-name">{displayName}</div>
+            <div className="sidebar-user-email">{email || 'dra.mew.store'}</div>
           </div>
         </div>
       </div>

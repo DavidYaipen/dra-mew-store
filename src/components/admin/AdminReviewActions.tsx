@@ -11,14 +11,19 @@ export function AdminReviewActions({ reviewId, approved }: { reviewId: string; a
   const approve = async () => {
     setLoading(true);
     try {
-      await fetch('/api/admin/reviews', {
+      const res = await fetch('/api/admin/reviews', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: reviewId, approved: true }),
       });
-      router.refresh();
+      if (res.ok) {
+        router.refresh();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Error al aprobar la resena');
+      }
     } catch {
-      // silent
+      alert('Error de conexion');
     } finally {
       setLoading(false);
     }
@@ -29,9 +34,14 @@ export function AdminReviewActions({ reviewId, approved }: { reviewId: string; a
     setLoading(true);
     try {
       const res = await fetch(`/api/admin/reviews?id=${reviewId}`, { method: 'DELETE' });
-      if (res.ok) router.refresh();
+      if (res.ok) {
+        router.refresh();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Error al eliminar');
+      }
     } catch {
-      // silent
+      alert('Error de conexion');
     } finally {
       setLoading(false);
     }

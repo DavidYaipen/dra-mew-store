@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useRef } from 'react';
+import { ProductImage } from '@/components/ui/ProductImage';
 
 const CATEGORIES = ['Peluches', 'Figuras', 'Cartas', 'Ropa', 'Accesorios'];
 const TINTS: Record<string, string> = {
@@ -196,11 +197,17 @@ export function ProductForm({ initialData }: { initialData?: Record<string, unkn
             }}
           >
             {imagePreview ? (
-              <img
-                src={imagePreview}
-                alt="Preview"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
+              imagePreview.startsWith('data:') ? (
+                // Preview local instantanea (FileReader) antes de subir — next/image no soporta data: URLs.
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                <ProductImage src={imagePreview} alt="Preview" size={120} />
+              )
             ) : (
               <span style={{ fontSize: 12, color: 'var(--text-faint)', textAlign: 'center', padding: 8 }}>
                 Sin imagen

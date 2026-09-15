@@ -9,6 +9,7 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+  margin-left: 260px;
 }
 
 .admin-content {
@@ -716,6 +717,10 @@
 @media (max-width: 768px) {
   .admin-sidebar {
     display: none;
+  }
+
+  .admin-main {
+    margin-left: 0;
   }
 
   .admin-content {

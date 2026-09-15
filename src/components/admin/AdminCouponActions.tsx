@@ -11,14 +11,19 @@ export function AdminCouponActions({ couponId, active }: { couponId: string; act
   const toggleActive = async () => {
     setLoading(true);
     try {
-      await fetch('/api/admin/coupons', {
+      const res = await fetch('/api/admin/coupons', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: couponId, active: !active }),
       });
-      router.refresh();
+      if (res.ok) {
+        router.refresh();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Error al actualizar el cupon');
+      }
     } catch {
-      // silent
+      alert('Error de conexion');
     } finally {
       setLoading(false);
     }
@@ -29,9 +34,14 @@ export function AdminCouponActions({ couponId, active }: { couponId: string; act
     setLoading(true);
     try {
       const res = await fetch(`/api/admin/coupons?id=${couponId}`, { method: 'DELETE' });
-      if (res.ok) router.refresh();
+      if (res.ok) {
+        router.refresh();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Error al eliminar');
+      }
     } catch {
-      // silent
+      alert('Error de conexion');
     } finally {
       setLoading(false);
     }

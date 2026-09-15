@@ -9,10 +9,20 @@ interface Product {
   name: string;
 }
 
-export function AddInventoryForm({ products }: { products: Product[] }) {
+interface Variant {
+  id: string;
+  product_id: number;
+  name: string;
+  stock: number;
+}
+
+export function AddInventoryForm({ products, variants }: { products: Product[]; variants: Variant[] }) {
   const router = useRouter();
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [productId, setProductId] = useState('');
+
+  const productVariants = variants.filter((v) => String(v.product_id) === productId);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -21,6 +31,7 @@ export function AddInventoryForm({ products }: { products: Product[] }) {
     const form = new FormData(e.currentTarget);
     const body = {
       product_id: Number(form.get('product_id')),
+      variant_id: form.get('variant_id') || null,
       quantity: Number(form.get('quantity')),
       reason: form.get('reason'),
       reference: form.get('reference') || null,
@@ -34,6 +45,7 @@ export function AddInventoryForm({ products }: { products: Product[] }) {
       });
       if (res.ok) {
         setShow(false);
+        setProductId('');
         router.refresh();
       } else {
         const data = await res.json();
@@ -69,13 +81,35 @@ export function AddInventoryForm({ products }: { products: Product[] }) {
             <div className="admin-form">
               <div className="form-group">
                 <label>Producto</label>
-                <select name="product_id" required>
+                <select
+                  name="product_id"
+                  required
+                  value={productId}
+                  onChange={(e) => setProductId(e.target.value)}
+                >
                   <option value="">Seleccionar producto...</option>
                   {products.map((p) => (
                     <option key={p.id} value={p.id}>{p.name}</option>
                   ))}
                 </select>
               </div>
+              {productId && (
+                productVariants.length > 0 ? (
+                  <div className="form-group">
+                    <label>Variante</label>
+                    <select name="variant_id" required>
+                      <option value="">Seleccionar variante...</option>
+                      {productVariants.map((v) => (
+                        <option key={v.id} value={v.id}>{v.name} (stock: {v.stock})</option>
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  <div style={{ fontSize: 13, color: 'var(--text-faint)' }}>
+                    Este producto no tiene variantes; el movimiento se registrará sin actualizar stock.
+                  </div>
+                )
+              )}
               <div className="form-row">
                 <div className="form-group">
                   <label>Cantidad (+ restock, - ajuste)</label>

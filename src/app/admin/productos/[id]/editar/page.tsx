@@ -1,14 +1,14 @@
 import { notFound } from 'next/navigation';
-import { createServiceClient } from '@/lib/supabase/service';
+import { requireAdmin } from '@/lib/supabase/admin';
 import { ProductForm } from '@/components/admin/ProductForm';
 
 export const dynamic = 'force-dynamic';
 
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const supabase = createServiceClient();
+  const { serviceClient } = await requireAdmin();
 
-  const { data: product } = await supabase
+  const { data: product } = await serviceClient
     .from('products')
     .select('*')
     .eq('id', Number(id))

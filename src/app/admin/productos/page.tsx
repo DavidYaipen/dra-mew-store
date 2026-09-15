@@ -3,6 +3,7 @@ import { formatPrice } from '@/lib/format';
 import Link from 'next/link';
 import { PlusIcon } from '@/components/admin/AdminIcons';
 import { AdminProductActions } from '@/components/admin/AdminProductActions';
+import { ProductImage } from '@/components/ui/ProductImage';
 
 export const dynamic = 'force-dynamic';
 
@@ -70,11 +71,7 @@ export default async function AdminProductsPage() {
                   <td className="mono">{product.id}</td>
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover', background: 'var(--graphite-100)' }}
-                      />
+                      <ProductImage src={product.image} alt={product.name} size={40} />
                       <div>
                         <div style={{ fontWeight: 600 }}>{product.name}</div>
                         {product.old_price && (

@@ -18,9 +18,14 @@ export function AdminOrderActions({ orderId, currentStatus }: { orderId: string;
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: orderId, status: newStatus }),
       });
-      if (res.ok) router.refresh();
+      if (res.ok) {
+        router.refresh();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Error al actualizar el estado');
+      }
     } catch {
-      // silent
+      alert('Error de conexion');
     } finally {
       setUpdating(false);
     }

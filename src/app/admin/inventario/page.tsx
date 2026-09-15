@@ -49,7 +49,7 @@ export default async function AdminInventoryPage() {
             {variants?.length || 0} variantes · {typedMovements.length} movimientos recientes
           </p>
         </div>
-        <AddInventoryForm products={products || []} />
+        <AddInventoryForm products={products || []} variants={variants || []} />
       </div>
 
       <div className="admin-grid-2">

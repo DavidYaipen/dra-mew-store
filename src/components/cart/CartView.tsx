@@ -7,7 +7,6 @@ import { useStore } from '@/store/useStore';
 import { ProductImage } from '@/components/ui/ProductImage';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { CloseIcon } from '@/components/ui/Icons';
-import { WhatsAppOrder } from './WhatsAppOrder';
 import styles from './CartView.module.css';
 
 export function CartView() {
@@ -109,7 +108,6 @@ export function CartView() {
           <Link href="/checkout" className={styles.checkout}>
             Finalizar compra
           </Link>
-          <WhatsAppOrder />
           <Link href="/productos" className={styles.keep}>
             Seguir comprando
           </Link>

@@ -23,12 +23,20 @@ export default async function AccountPage() {
 
   const supabase = await createClient();
 
-  const { data: orders } = await supabase
-    .from('orders')
-    .select('id, order_number, status, total, created_at')
-    .eq('customer_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(10);
+  const { data: customer } = await supabase
+    .from('customers')
+    .select('id')
+    .eq('email', user.email)
+    .single();
+
+  const { data: orders } = customer
+    ? await supabase
+        .from('orders')
+        .select('id, order_number, status, total, created_at')
+        .eq('customer_id', customer.id)
+        .order('created_at', { ascending: false })
+        .limit(10)
+    : { data: [] };
 
   const customerName = user.user_metadata?.name || user.email?.split('@')[0] || 'Usuario';
 

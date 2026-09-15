@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createServiceClient } from '@/lib/supabase/service';
 import { WHATSAPP_PHONE } from '@/lib/constants';
 import type { CheckoutPayload } from '@/lib/types';
 
@@ -8,7 +8,7 @@ const STORE_URL = 'https://dra-mew-store.vercel.app';
 export async function POST(request: NextRequest) {
   try {
     const payload: CheckoutPayload = await request.json();
-    const supabase = await createClient();
+    const supabase = createServiceClient();
 
     // 1. Validar cupón si se proporciona
     let discount = 0;
@@ -168,7 +168,12 @@ export async function POST(request: NextRequest) {
       whatsapp_url: whatsappUrl,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Error al procesar el pedido';
+    const message =
+      error instanceof Error
+        ? error.message
+        : error && typeof error === 'object' && 'message' in error
+          ? String(error.message)
+          : 'Error al procesar el pedido';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

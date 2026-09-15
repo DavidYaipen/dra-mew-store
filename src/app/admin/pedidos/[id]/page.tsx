@@ -4,6 +4,7 @@ import { requireAdmin } from '@/lib/supabase/admin';
 import { formatPrice } from '@/lib/format';
 import { ArrowLeftIcon } from '@/components/admin/AdminIcons';
 import { AdminOrderActions } from '@/components/admin/AdminOrderActions';
+import { AdminOrderCustomerForm } from '@/components/admin/AdminOrderCustomerForm';
 import { ProductImage } from '@/components/ui/ProductImage';
 import type { OrderItem, OrderStatus, ShippingAddress } from '@/lib/types';
 
@@ -126,31 +127,11 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-          <div className="admin-card">
-            <div className="admin-card-header">
-              <h3 className="admin-card-title">Cliente</h3>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14 }}>
-              <div style={{ fontWeight: 600 }}>{typedOrder.customers?.name || 'Sin nombre'}</div>
-              <div style={{ color: 'var(--text-faint)' }}>{typedOrder.customers?.email}</div>
-              <div style={{ color: 'var(--text-faint)' }}>{typedOrder.customers?.phone}</div>
-            </div>
-          </div>
-
-          {address && (
-            <div className="admin-card">
-              <div className="admin-card-header">
-                <h3 className="admin-card-title">Direccion de envio</h3>
-              </div>
-              <div style={{ fontSize: 14, lineHeight: 1.6 }}>
-                <div>{address.name}</div>
-                <div>{address.street}</div>
-                <div>{address.city}, {address.state} {address.zip}</div>
-                <div>{address.country}</div>
-                <div style={{ color: 'var(--text-faint)' }}>{address.phone}</div>
-              </div>
-            </div>
-          )}
+          <AdminOrderCustomerForm
+            orderId={typedOrder.id}
+            customer={typedOrder.customers}
+            address={address}
+          />
 
           <div className="admin-card">
             <div className="admin-card-header">

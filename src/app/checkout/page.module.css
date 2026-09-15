@@ -123,6 +123,11 @@
   background: #fdf2f8;
 }
 
+.radio[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .radio input {
   margin: 0;
 }

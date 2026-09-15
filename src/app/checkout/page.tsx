@@ -282,24 +282,12 @@ export default function CheckoutPage() {
                   />
                   <span>📱 WhatsApp — Coordinar pago directo</span>
                 </label>
-                <label className={styles.radio}>
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="card"
-                    checked={form.payment_method === 'card'}
-                    onChange={(e) => updateField('payment_method', e.target.value)}
-                  />
+                <label className={styles.radio} aria-disabled="true">
+                  <input type="radio" name="payment" value="card" disabled />
                   <span>💳 Tarjeta (próximamente)</span>
                 </label>
-                <label className={styles.radio}>
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="paypal"
-                    checked={form.payment_method === 'paypal'}
-                    onChange={(e) => updateField('payment_method', e.target.value)}
-                  />
+                <label className={styles.radio} aria-disabled="true">
+                  <input type="radio" name="payment" value="paypal" disabled />
                   <span>PayPal (próximamente)</span>
                 </label>
               </div>

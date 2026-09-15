@@ -1,9 +1,15 @@
-import type { Review } from '@/lib/reviews';
 import { StarRating } from './StarRating';
 import styles from './ReviewCard.module.css';
 
 interface ReviewCardProps {
-  review: Review;
+  review: {
+    id: string | number;
+    name: string;
+    rating: number;
+    comment: string;
+    date: string;
+    product?: string;
+  };
 }
 
 export function ReviewCard({ review }: ReviewCardProps) {

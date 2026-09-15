@@ -1,16 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { requireAdmin } from '@/lib/supabase/admin';
 
 export async function PATCH(request: NextRequest) {
   const { serviceClient } = await requireAdmin();
   const body = await request.json();
 
-  const { error } = await serviceClient
+  const { data, error } = await serviceClient
     .from('reviews')
     .update({ approved: body.approved })
-    .eq('id', body.id);
+    .eq('id', body.id)
+    .select('id');
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (!data?.length) {
+    return NextResponse.json({ error: 'No se encontro la resena' }, { status: 404 });
+  }
+  revalidatePath('/reseñas');
   return NextResponse.json({ ok: true });
 }
 
@@ -21,7 +27,11 @@ export async function DELETE(request: NextRequest) {
 
   if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
 
-  const { error } = await serviceClient.from('reviews').delete().eq('id', id);
+  const { data, error } = await serviceClient.from('reviews').delete().eq('id', id).select('id');
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (!data?.length) {
+    return NextResponse.json({ error: 'No se encontro la resena' }, { status: 404 });
+  }
+  revalidatePath('/reseñas');
   return NextResponse.json({ ok: true });
 }

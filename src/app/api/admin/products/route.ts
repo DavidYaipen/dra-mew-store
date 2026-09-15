@@ -20,20 +20,26 @@ export async function POST(request: NextRequest) {
   const { serviceClient } = await requireAdmin();
   const body = await request.json();
 
-  const { error } = await serviceClient.from('products').insert({
-    id: body.id,
-    name: body.name,
-    cat: body.cat,
-    price: body.price,
-    old_price: body.old_price,
-    rating: body.rating,
-    image: body.image,
-    tint: body.tint,
-    badge: body.badge,
-    is_featured: body.is_featured,
-  });
+  const { data, error } = await serviceClient
+    .from('products')
+    .insert({
+      id: body.id,
+      name: body.name,
+      cat: body.cat,
+      price: body.price,
+      old_price: body.old_price,
+      rating: body.rating,
+      image: body.image,
+      tint: body.tint,
+      badge: body.badge,
+      is_featured: body.is_featured,
+    })
+    .select('id');
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (!data?.length) {
+    return NextResponse.json({ error: 'No se pudo crear el producto' }, { status: 500 });
+  }
   revalidateStorefront();
   return NextResponse.json({ ok: true });
 }
@@ -43,12 +49,16 @@ export async function PUT(request: NextRequest) {
   const body = await request.json();
   const { id, ...updates } = body;
 
-  const { error } = await serviceClient
+  const { data, error } = await serviceClient
     .from('products')
     .update(updates)
-    .eq('id', id);
+    .eq('id', id)
+    .select('id');
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (!data?.length) {
+    return NextResponse.json({ error: 'No se encontro el producto' }, { status: 404 });
+  }
   revalidateStorefront();
   return NextResponse.json({ ok: true });
 }
@@ -60,8 +70,15 @@ export async function DELETE(request: NextRequest) {
 
   if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
 
-  const { error } = await serviceClient.from('products').delete().eq('id', Number(id));
+  const { data, error } = await serviceClient
+    .from('products')
+    .delete()
+    .eq('id', Number(id))
+    .select('id');
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (!data?.length) {
+    return NextResponse.json({ error: 'No se encontro el producto' }, { status: 404 });
+  }
   revalidateStorefront();
   return NextResponse.json({ ok: true });
 }

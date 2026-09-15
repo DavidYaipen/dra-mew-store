@@ -9,7 +9,12 @@ import { ProductImage } from '@/components/ui/ProductImage';
 import { HeartIcon } from '@/components/ui/Icons';
 import styles from './ProductDetail.module.css';
 
-const GALLERY_EXTRAS = ['five-star.png', 'star.png', 'lightning.png'];
+function stockStatus(stock: number | undefined): { label: string; level: 'ok' | 'low' | 'out' } {
+  if (stock === undefined) return { label: 'En stock · listo para enviar', level: 'ok' };
+  if (stock === 0) return { label: 'Agotado', level: 'out' };
+  if (stock <= 5) return { label: `¡Últimas ${stock} unidades!`, level: 'low' };
+  return { label: 'En stock · listo para enviar', level: 'ok' };
+}
 
 export function ProductDetail({ product }: { product: Product }) {
   const { addToCart, toggleWishlist, isWished } = useStore();
@@ -17,7 +22,7 @@ export function ProductDetail({ product }: { product: Product }) {
   const wished = isWished(product.id);
   const discount = discountLabel(product.price, product.oldPrice);
   const onSale = product.oldPrice != null;
-  const thumbs = [product.image, ...GALLERY_EXTRAS.map((f) => `/assets/thiings/${f}`)];
+  const stock = stockStatus(product.stock);
 
   return (
     <div className={styles.layout}>
@@ -28,13 +33,6 @@ export function ProductDetail({ product }: { product: Product }) {
         >
           <ProductImage src={product.image} alt={product.name} size={280} shadow="0 26px 38px rgba(14,15,18,.2)" priority />
           {product.badge && <span className={styles.badge}>{product.badge}</span>}
-        </div>
-        <div className={styles.thumbs}>
-          {thumbs.map((src, i) => (
-            <div key={`${src}-${i}`} className={styles.thumb}>
-              <ProductImage src={src} alt="" size={54} shadow="0 6px 9px rgba(14,15,18,.16)" />
-            </div>
-          ))}
         </div>
       </div>
 
@@ -47,7 +45,7 @@ export function ProductDetail({ product }: { product: Product }) {
             <strong className={styles.mono}>{product.rating}</strong>
           </span>
           <span className={styles.dot} />
-          <span className={styles.stock}>En stock · listo para enviar</span>
+          <span className={styles.stock} data-level={stock.level}>{stock.label}</span>
         </div>
 
         <div className={styles.prices}>

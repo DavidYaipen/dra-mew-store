@@ -91,6 +91,16 @@
   color: var(--text-muted);
 }
 
+.stock[data-level='low'] {
+  color: #d97706;
+  font-weight: 600;
+}
+
+.stock[data-level='out'] {
+  color: #dc2626;
+  font-weight: 600;
+}
+
 .prices {
   display: flex;
   align-items: baseline;

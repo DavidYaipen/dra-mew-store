@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { WHATSAPP_PHONE } from '@/lib/constants';
 import type { CheckoutPayload } from '@/lib/types';
 
-const STORE_PHONE = '51975625359'; // WhatsApp de la tienda
-const STORE_URL = 'https://cactusdetallestrujillo.tiendada.com';
+const STORE_URL = 'https://dra-mew-store.vercel.app';
 
 export async function POST(request: NextRequest) {
   try {
@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
       total,
     });
 
-    const whatsappUrl = `https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(whatsappMessage)}`;
+    const whatsappUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(whatsappMessage)}`;
 
     return NextResponse.json({
       order_id: order.id,

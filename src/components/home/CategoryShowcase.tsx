@@ -1,10 +1,12 @@
 import { Suspense } from 'react';
-import { HOME_CATEGORIES } from '@/lib/catalog';
+import { getCategoryCounts } from '@/lib/supabase/catalog';
 import { CategoryCard } from '@/components/product/CategoryCard';
 import { FilterChips } from '@/components/product/FilterChips';
 import styles from './CategoryShowcase.module.css';
 
-export function CategoryShowcase() {
+export async function CategoryShowcase() {
+  const categories = await getCategoryCounts();
+
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
@@ -18,8 +20,16 @@ export function CategoryShowcase() {
           </Suspense>
         </div>
         <div className={styles.grid}>
-          {HOME_CATEGORIES.map((category) => (
-            <CategoryCard key={category.name} category={category} />
+          {categories.map((category) => (
+            <CategoryCard
+              key={category.name}
+              category={{
+                name: category.name,
+                count: `${category.count}+ piezas`,
+                image: category.image,
+                tint: category.tint,
+              }}
+            />
           ))}
         </div>
       </div>

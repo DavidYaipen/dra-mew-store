@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import type { CategoryShortcut } from '@/lib/catalog';
+import type { CategoryShortcut } from '@/lib/types';
 import { ProductImage } from '@/components/ui/ProductImage';
 import styles from './CategoryCard.module.css';
 
@@ -7,7 +7,7 @@ import styles from './CategoryCard.module.css';
 export function CategoryCard({ category }: { category: CategoryShortcut }) {
   return (
     <Link
-      href={`/productos?cat=${encodeURIComponent(category.name)}`}
+      href={`/categoria/${category.name.toLowerCase()}`}
       className={styles.wrap}
       aria-label={`Ver categoría ${category.name}`}
     >

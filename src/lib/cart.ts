@@ -1,4 +1,4 @@
-import type { CartLine } from './types';
+import type { CartLine, Product } from './types';
 import { getProduct } from './catalog';
 
 /** Umbral de envío gratis (€). */
@@ -29,9 +29,9 @@ export function cartCount(cart: CartLine[]): number {
 }
 
 /** Subtotal del carrito en €. Ignora líneas con producto desconocido. */
-export function subtotal(cart: CartLine[]): number {
+export function subtotal(cart: CartLine[], products?: Map<number, Product>): number {
   return cart.reduce((a, c) => {
-    const p = getProduct(c.id);
+    const p = products ? products.get(c.id) : getProduct(c.id);
     return p ? a + p.price * c.qty : a;
   }, 0);
 }

@@ -1,6 +1,5 @@
 'use client';
 
-import { getProduct } from '@/lib/catalog';
 import type { Product } from '@/lib/types';
 import { useStore } from '@/store/useStore';
 import { ProductGrid } from '@/components/product/ProductGrid';
@@ -8,7 +7,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import styles from './WishlistView.module.css';
 
 export function WishlistView() {
-  const { wishlist } = useStore();
+  const { wishlist, getProduct } = useStore();
   const products = wishlist
     .map((id) => getProduct(id))
     .filter((p): p is Product => p != null);

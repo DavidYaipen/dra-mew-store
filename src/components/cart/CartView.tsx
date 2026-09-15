@@ -1,17 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import { getProduct } from '@/lib/catalog';
 import { formatEuro } from '@/lib/format';
 import { shippingProgress } from '@/lib/cart';
 import { useStore } from '@/store/useStore';
 import { ProductImage } from '@/components/ui/ProductImage';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { CloseIcon } from '@/components/ui/Icons';
+import { WhatsAppOrder } from './WhatsAppOrder';
 import styles from './CartView.module.css';
 
 export function CartView() {
-  const { cart, subtotal, changeQty, removeFromCart, showToast } = useStore();
+  const { cart, subtotal, changeQty, removeFromCart, getProduct } = useStore();
 
   if (cart.length === 0) {
     return (
@@ -106,13 +106,10 @@ export function CartView() {
             <span className={styles.totalLabel}>Total</span>
             <span className={styles.total}>{formatEuro(subtotal)}</span>
           </div>
-          <button
-            type="button"
-            className={styles.checkout}
-            onClick={() => showToast('Pedido realizado (demo). ¡Gracias!')}
-          >
+          <Link href="/checkout" className={styles.checkout}>
             Finalizar compra
-          </button>
+          </Link>
+          <WhatsAppOrder />
           <Link href="/productos" className={styles.keep}>
             Seguir comprando
           </Link>

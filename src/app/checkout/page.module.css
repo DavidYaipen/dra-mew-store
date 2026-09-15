@@ -1,0 +1,280 @@
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+.empty {
+  text-align: center;
+  padding: 80px 16px;
+  color: var(--graphite-500);
+}
+
+.heading {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 32px;
+}
+
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Steps */
+.steps {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.stepBtn {
+  flex: 1;
+  padding: 10px;
+  background: var(--graphite-50);
+  border: 1px solid var(--graphite-200);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--graphite-500);
+}
+
+.stepBtn.active {
+  background: var(--graphite-900);
+  color: #fff;
+  border-color: var(--graphite-900);
+}
+
+/* Form */
+.section {
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid var(--graphite-100);
+}
+
+.sectionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: var(--graphite-600);
+}
+
+.field input, .field textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--graphite-200);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: var(--font-manrope);
+  box-sizing: border-box;
+}
+
+.field input:focus, .field textarea:focus {
+  outline: none;
+  border-color: var(--pink);
+}
+
+.fieldRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border: 1px solid var(--graphite-200);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.radio:has(input:checked) {
+  border-color: var(--pink);
+  background: #fdf2f8;
+}
+
+.radio input {
+  margin: 0;
+}
+
+.btnRow {
+  display: flex;
+  gap: 12px;
+}
+
+.nextBtn, .confirmBtn {
+  padding: 12px 24px;
+  background: var(--pink);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 16px;
+}
+
+.nextBtn:disabled, .confirmBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.confirmBtn {
+  background: var(--graphite-900);
+}
+
+.backBtn {
+  padding: 12px 24px;
+  background: none;
+  border: 1px solid var(--graphite-200);
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 16px;
+}
+
+/* Summary */
+.summary {
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid var(--graphite-100);
+  position: sticky;
+  top: 100px;
+  align-self: start;
+}
+
+.summaryTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+
+.summaryItem {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--graphite-600);
+  margin-bottom: 8px;
+}
+
+.itemName {
+  flex: 1;
+  margin-right: 12px;
+}
+
+.couponSection {
+  margin: 16px 0;
+  padding: 12px 0;
+  border-top: 1px solid var(--graphite-100);
+  border-bottom: 1px solid var(--graphite-100);
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--graphite-600);
+  margin-bottom: 8px;
+}
+
+.discount {
+  color: #16a34a;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  font-weight: 700;
+  border-top: 1px solid var(--graphite-100);
+  padding-top: 8px;
+  margin-top: 8px;
+}
+
+.freeShipping {
+  text-align: center;
+  font-size: 13px;
+  color: #16a34a;
+  margin-top: 8px;
+}
+
+/* Result */
+.result {
+  text-align: center;
+  padding: 48px 16px;
+}
+
+.checkIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #f0fdf4;
+  color: #16a34a;
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.result h1 {
+  font-size: 24px;
+}
+
+.total {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 12px 0 24px;
+}
+
+.whatsappBtn {
+  display: inline-block;
+  padding: 14px 32px;
+  background: #25D366;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.whatsappBtn:hover {
+  background: #20bd5a;
+}
+
+.note {
+  font-size: 13px;
+  color: var(--graphite-500);
+}

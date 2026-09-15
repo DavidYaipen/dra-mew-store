@@ -21,24 +21,29 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     label: 'Figuras',
-    href: '/productos?cat=Figuras',
-    isActive: (p, sp) => onListing(p) && sp.get('cat') === 'Figuras',
+    href: '/categoria/figuras',
+    isActive: (p) => p === '/categoria/figuras',
   },
   {
     label: 'Cartas',
-    href: '/productos?cat=Cartas',
-    isActive: (p, sp) => onListing(p) && sp.get('cat') === 'Cartas',
+    href: '/categoria/cartas',
+    isActive: (p) => p === '/categoria/cartas',
   },
   {
     label: 'Accesorios',
-    href: '/productos?cat=Accesorios',
-    isActive: (p, sp) => onListing(p) && sp.get('cat') === 'Accesorios',
+    href: '/categoria/accesorios',
+    isActive: (p) => p === '/categoria/accesorios',
   },
   {
     label: 'Rebajas',
     href: '/productos?sale=1',
     sale: true,
     isActive: (p, sp) => onListing(p) && sp.get('sale') === '1',
+  },
+  {
+    label: 'Blog',
+    href: '/blog',
+    isActive: (p) => p.startsWith('/blog'),
   },
   {
     label: 'Sobre nosotros',

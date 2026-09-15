@@ -1,0 +1,90 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+}
+
+.input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--graphite-200);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: var(--font-manrope);
+  background: #fff;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--pink);
+}
+
+.applyBtn {
+  padding: 10px 18px;
+  background: var(--graphite-900);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.applyBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error {
+  font-size: 13px;
+  color: #e53e3e;
+}
+
+.applied {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 8px;
+}
+
+.appliedInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.code {
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.discount {
+  font-size: 13px;
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.removeBtn {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: underline;
+}

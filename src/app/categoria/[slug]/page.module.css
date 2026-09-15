@@ -1,0 +1,26 @@
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-4) 0;
+}
+
+.breadcrumb a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.breadcrumb a:hover {
+  color: var(--accent-deep);
+}
+
+.products {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-4);
+}

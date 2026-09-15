@@ -1,4 +1,4 @@
-import type { Category, Product } from './types';
+import type { Product, CategoryShortcut } from './types';
 
 /** Prefijo de los placeholders 3D. Cambia el campo `image` por una ruta en
  *  /products/<archivo>.jpg para servir fotos reales (ver README). */
@@ -35,13 +35,6 @@ export function relatedProducts(product: Product, limit = 4): Product[] {
     related = related.concat(CATALOG.filter((p) => p.cat !== product.cat).slice(0, limit - related.length));
   }
   return related.slice(0, limit);
-}
-
-export interface CategoryShortcut {
-  name: Category;
-  count: string;
-  image: string;
-  tint: string;
 }
 
 /** Atajos de categoría mostrados en la home (estilo image-forward). */

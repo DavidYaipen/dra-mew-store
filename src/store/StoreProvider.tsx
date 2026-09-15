@@ -9,7 +9,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import type { CartLine } from '@/lib/types';
+import type { CartLine, Product } from '@/lib/types';
 import {
   addLine,
   cartCount as countUnits,
@@ -31,6 +31,8 @@ export interface StoreContextValue {
   cartCount: number;
   wishCount: number;
   subtotal: number;
+  productMap: Map<number, Product>;
+  getProduct: (id: number) => Product | undefined;
   addToCart: (id: number, qty?: number) => void;
   changeQty: (id: number, delta: number) => void;
   removeFromCart: (id: number) => void;
@@ -60,6 +62,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [wishlist, setWishlist] = useState<number[]>([]);
   const [toast, setToast] = useState<ToastState | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const [productMap, setProductMap] = useState<Map<number, Product>>(new Map());
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // Hidratar desde localStorage tras el montaje (evita desajustes SSR).
@@ -67,6 +70,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setCart(readStorage<CartLine[]>(CART_KEY, []));
     setWishlist(readStorage<number[]>(WISH_KEY, []));
     setHydrated(true);
+  }, []);
+
+  // Fetch catálogo desde la API y construir Map para resolución de productos.
+  useEffect(() => {
+    fetch('/api/catalog')
+      .then((r) => r.json())
+      .then((data: Product[]) => {
+        setProductMap(new Map(data.map((p) => [p.id, p])));
+      })
+      .catch(() => {
+        // Silenciar errores de red; el Map queda vacío y la UI muestra fallback.
+      });
   }, []);
 
   useEffect(() => {
@@ -119,6 +134,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const isWished = useCallback((id: number) => wishlist.includes(id), [wishlist]);
 
+  const getProductFn = useCallback(
+    (id: number) => productMap.get(id),
+    [productMap],
+  );
+
   const value = useMemo<StoreContextValue>(
     () => ({
       cart,
@@ -126,7 +146,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       toast,
       cartCount: countUnits(cart),
       wishCount: wishlist.length,
-      subtotal: subtotalFn(cart),
+      subtotal: subtotalFn(cart, productMap),
+      productMap,
+      getProduct: getProductFn,
       addToCart,
       changeQty,
       removeFromCart,
@@ -139,6 +161,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       cart,
       wishlist,
       toast,
+      productMap,
+      getProductFn,
       addToCart,
       changeQty,
       removeFromCart,

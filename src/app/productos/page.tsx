@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { CATALOG } from '@/lib/catalog';
+import { getCatalog } from '@/lib/supabase/catalog';
 import { filterProducts } from '@/lib/filter';
 import { resolveListing, type ListingParams } from '@/lib/listing';
 import { Section } from '@/components/layout/Section';
@@ -10,6 +10,7 @@ import { ProductGrid } from '@/components/product/ProductGrid';
 import { EmptyState } from '@/components/ui/EmptyState';
 import styles from './page.module.css';
 
+export const revalidate = 60;
 export const metadata: Metadata = { title: 'Catálogo' };
 
 export default async function ListingPage({
@@ -19,7 +20,8 @@ export default async function ListingPage({
 }) {
   const params = await searchParams;
   const { filter, title } = resolveListing(params);
-  const products = filterProducts(CATALOG, filter);
+  const catalog = await getCatalog();
+  const products = filterProducts(catalog, filter);
 
   return (
     <Section background="#fff">

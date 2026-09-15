@@ -1,0 +1,192 @@
+.page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: var(--graphite-500);
+  margin-bottom: 24px;
+}
+
+/* Progress */
+.progress {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.progress::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  height: 2px;
+  background: var(--graphite-200);
+}
+
+.progressStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 1;
+}
+
+.dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--graphite-200);
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 2px var(--graphite-200);
+}
+
+.progressStep.done .dot {
+  background: var(--pink);
+  box-shadow: 0 0 0 2px var(--pink);
+}
+
+.progressStep.current .dot {
+  background: var(--pink);
+  box-shadow: 0 0 0 2px var(--pink), 0 0 0 6px rgba(245,111,161,.2);
+}
+
+.stepLabel {
+  font-size: 11px;
+  color: var(--graphite-500);
+  text-align: center;
+}
+
+.progressStep.done .stepLabel,
+.progressStep.current .stepLabel {
+  color: var(--graphite-900);
+  font-weight: 600;
+}
+
+/* Card */
+.card {
+  background: #fff;
+  border: 1px solid var(--graphite-100);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--graphite-600);
+  margin-bottom: 8px;
+}
+
+.discount {
+  color: #16a34a;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  font-weight: 700;
+  border-top: 1px solid var(--graphite-100);
+  padding-top: 8px;
+  margin-top: 8px;
+}
+
+.statusBadge {
+  font-weight: 600;
+  color: var(--pink);
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--graphite-50);
+}
+
+/* Search */
+.searchCard {
+  background: #fff;
+  border: 1px solid var(--graphite-100);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: var(--graphite-600);
+}
+
+.field input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--graphite-200);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: var(--font-manrope);
+  box-sizing: border-box;
+}
+
+.field input:focus {
+  outline: none;
+  border-color: var(--pink);
+}
+
+.error {
+  font-size: 13px;
+  color: #e53e3e;
+  margin-bottom: 12px;
+}
+
+.searchBtn {
+  width: 100%;
+  padding: 12px;
+  background: var(--pink);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.searchBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.backBtn {
+  display: block;
+  margin: 16px auto 0;
+  padding: 10px 20px;
+  background: none;
+  border: 1px solid var(--graphite-200);
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}

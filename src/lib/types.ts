@@ -22,14 +22,157 @@ export interface Product {
   tint: string;
   /** Etiqueta opcional ("Nuevo", "Últimas", "Rara"...). */
   badge?: string;
+  /** Stock total (sumatoria de variantes o stock directo). */
+  stock?: number;
+}
+
+export interface ProductVariant {
+  id: string;
+  product_id: number;
+  name: string;
+  sku?: string;
+  price_override?: number;
+  stock: number;
+  image?: string;
 }
 
 export interface CartLine {
   id: number;
   qty: number;
+  variant_id?: string;
 }
 
 export interface FaqItem {
   q: string;
   a: string;
+}
+
+export interface CategoryShortcut {
+  name: Category;
+  count: string;
+  image: string;
+  tint: string;
+}
+
+// ─── Orders ──────────────────────────────────────────────────
+
+export type OrderStatus =
+  | 'pending'
+  | 'confirmed'
+  | 'processing'
+  | 'shipped'
+  | 'delivered'
+  | 'cancelled'
+  | 'refunded';
+
+export interface OrderItem {
+  id: string;
+  order_id: string;
+  product_id: number;
+  variant_id?: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image?: string;
+}
+
+export interface Order {
+  id: string;
+  order_number: number;
+  customer_id?: string;
+  status: OrderStatus;
+  subtotal: number;
+  discount: number;
+  shipping_cost: number;
+  total: number;
+  coupon_id?: string;
+  shipping_method?: string;
+  shipping_address?: ShippingAddress;
+  payment_method?: string;
+  payment_status: string;
+  notes?: string;
+  whatsapp_sent: boolean;
+  created_at: string;
+  updated_at: string;
+  items?: OrderItem[];
+}
+
+// ─── Customers ───────────────────────────────────────────────
+
+export interface Customer {
+  id: string;
+  email?: string;
+  name: string;
+  phone?: string;
+  address?: ShippingAddress;
+}
+
+export interface ShippingAddress {
+  name: string;
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
+  phone: string;
+}
+
+// ─── Coupons ─────────────────────────────────────────────────
+
+export interface Coupon {
+  id: string;
+  code: string;
+  discount_type: 'percentage' | 'fixed';
+  discount_value: number;
+  min_order: number;
+  max_uses?: number;
+  used_count: number;
+  valid_from: string;
+  valid_until?: string;
+  active: boolean;
+}
+
+export interface CouponValidation {
+  valid: boolean;
+  coupon?: Coupon;
+  error?: string;
+  discount_amount?: number;
+}
+
+// ─── Shipping ────────────────────────────────────────────────
+
+export interface ShippingMethod {
+  id: string;
+  name: string;
+  price: number;
+  estimated_days: string;
+  free_threshold?: number;
+}
+
+// ─── Checkout ────────────────────────────────────────────────
+
+export interface CheckoutPayload {
+  customer: {
+    name: string;
+    email: string;
+    phone: string;
+  };
+  shipping_address: ShippingAddress;
+  shipping_method: string;
+  payment_method: string;
+  coupon_code?: string;
+  notes?: string;
+  cart: CartLine[];
+}
+
+// ─── Reviews ─────────────────────────────────────────────────
+
+export interface Review {
+  id: string;
+  product_id: number;
+  customer_name: string;
+  rating: number;
+  comment?: string;
+  approved: boolean;
+  created_at: string;
 }

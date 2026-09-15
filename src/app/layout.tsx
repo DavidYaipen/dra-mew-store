@@ -10,6 +10,8 @@ import { CategoryNav } from '@/components/layout/CategoryNav';
 import { Footer } from '@/components/layout/Footer';
 import { Toast } from '@/components/layout/Toast';
 import { BackToTop } from '@/components/layout/BackToTop';
+import { FloatingWhatsApp } from '@/components/layout/FloatingWhatsApp';
+import { AnalyticsScripts } from '@/components/layout/AnalyticsScripts';
 
 const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope', display: 'swap' });
 const instrument = Instrument_Serif({
@@ -45,6 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" className={`${manrope.variable} ${instrument.variable} ${jetbrains.variable}`}>
       <body>
+        <AnalyticsScripts />
         <StoreProvider>
           <AnnouncementBar />
           <Header />
@@ -55,6 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Footer />
           <Toast />
           <BackToTop />
+          <FloatingWhatsApp />
         </StoreProvider>
       </body>
     </html>

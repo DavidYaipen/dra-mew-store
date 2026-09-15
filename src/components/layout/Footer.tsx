@@ -34,17 +34,20 @@ export function Footer() {
         <div>
           <div className={styles.colTitle}>Tienda</div>
           <div className={styles.links}>
-            <Link href="/productos?cat=Peluches" className={styles.link}>
+            <Link href="/categoria/peluches" className={styles.link}>
               Peluches
             </Link>
-            <Link href="/productos?cat=Figuras" className={styles.link}>
+            <Link href="/categoria/figuras" className={styles.link}>
               Figuras
             </Link>
-            <Link href="/productos?cat=Cartas" className={styles.link}>
+            <Link href="/categoria/cartas" className={styles.link}>
               Cartas
             </Link>
-            <Link href="/productos?cat=Ropa" className={styles.link}>
+            <Link href="/categoria/ropa" className={styles.link}>
               Ropa
+            </Link>
+            <Link href="/blog" className={styles.link}>
+              Blog
             </Link>
           </div>
         </div>
@@ -63,6 +66,24 @@ export function Footer() {
             </Link>
             <Link href="/ayuda?tab=contacto" className={styles.link}>
               Contacto
+            </Link>
+            <Link href="/reseñas" className={styles.link}>
+              Reseñas
+            </Link>
+          </div>
+        </div>
+
+        <div>
+          <div className={styles.colTitle}>Legal</div>
+          <div className={styles.links}>
+            <Link href="/privacidad" className={styles.link}>
+              Política de privacidad
+            </Link>
+            <Link href="/devoluciones" className={styles.link}>
+              Política de devoluciones
+            </Link>
+            <Link href="/terminos" className={styles.link}>
+              Términos y condiciones
             </Link>
           </div>
         </div>

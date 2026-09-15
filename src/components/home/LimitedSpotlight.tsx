@@ -1,12 +1,10 @@
-import { CATALOG, FEATURED_IDS } from '@/lib/catalog';
+import { getFeaturedProducts } from '@/lib/supabase/catalog';
 import { LinkButton } from '@/components/ui/Button';
 import { ProductCard } from '@/components/product/ProductCard';
 import styles from './LimitedSpotlight.module.css';
 
-export function LimitedSpotlight() {
-  const featured = FEATURED_IDS.map((id) => CATALOG.find((p) => p.id === id)).filter(
-    (p): p is NonNullable<typeof p> => p != null,
-  );
+export async function LimitedSpotlight() {
+  const featured = await getFeaturedProducts();
 
   return (
     <section className={styles.section}>

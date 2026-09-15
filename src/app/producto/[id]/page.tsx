@@ -1,14 +1,17 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { CATALOG, getProduct, relatedProducts } from '@/lib/catalog';
+import { getCatalog, getProductFromDB, relatedProductsFromDB } from '@/lib/supabase/catalog';
 import { Section } from '@/components/layout/Section';
 import { Breadcrumb } from '@/components/layout/Breadcrumb';
 import { ProductDetail } from '@/components/product/ProductDetail';
 import { ProductGrid } from '@/components/product/ProductGrid';
 import styles from './page.module.css';
 
-export function generateStaticParams() {
-  return CATALOG.map((p) => ({ id: String(p.id) }));
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const catalog = await getCatalog();
+  return catalog.map((p) => ({ id: String(p.id) }));
 }
 
 export async function generateMetadata({
@@ -17,16 +20,16 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const product = getProduct(Number(id));
+  const product = await getProductFromDB(Number(id));
   return { title: product ? product.name : 'Producto' };
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const product = getProduct(Number(id));
+  const product = await getProductFromDB(Number(id));
   if (!product) notFound();
 
-  const related = relatedProducts(product);
+  const related = await relatedProductsFromDB(product);
 
   return (
     <Section background="#fff">

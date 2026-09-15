@@ -59,7 +59,7 @@ export function trackAddToCart(product: { id: number; name: string; price: numbe
 export function trackBeginCheckout(items: Array<{ id: number; name: string; price: number; qty: number }>, total: number) {
   trackEvent('begin_checkout', {
     value: total,
-    currency: 'EUR',
+    currency: 'PEN',
     items: items.map((i) => ({
       item_id: String(i.id),
       item_name: i.name,
@@ -74,6 +74,6 @@ export function trackPurchase(orderId: string, total: number) {
   trackEvent('purchase', {
     transaction_id: orderId,
     value: total,
-    currency: 'EUR',
+    currency: 'PEN',
   });
 }

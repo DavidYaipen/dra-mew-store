@@ -5,7 +5,7 @@ export function AnnouncementBar() {
   return (
     <div className={styles.bar}>
       <span className={styles.item}>
-        <span className={styles.spark}>✦</span> Envío gratis desde 35 €
+        <span className={styles.spark}>✦</span> Envío gratis desde S/ 150
       </span>
       <span className={styles.dot} />
       <span>Devoluciones en 30 días</span>

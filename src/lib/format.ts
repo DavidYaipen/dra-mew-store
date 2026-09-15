@@ -1,7 +1,10 @@
-/** Formatea un número como precio en euros, estilo español: 34,99 €. */
-export function formatEuro(n: number): string {
-  return n.toFixed(2).replace('.', ',') + ' €';
+/** Formatea un número como precio en soles: S/ 34.99. */
+export function formatPrice(n: number): string {
+  return 'S/ ' + n.toFixed(2);
 }
+
+/** @deprecated Usa formatPrice */
+export const formatEuro = formatPrice;
 
 /** Porcentaje de descuento (entero) entre precio actual y anterior, p.ej. "-25%". */
 export function discountLabel(price: number, oldPrice?: number): string | null {

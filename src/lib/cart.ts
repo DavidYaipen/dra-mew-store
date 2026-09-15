@@ -1,8 +1,8 @@
 import type { CartLine, Product } from './types';
 import { getProduct } from './catalog';
 
-/** Umbral de envío gratis (€). */
-export const FREE_SHIPPING_THRESHOLD = 35;
+/** Umbral de envío gratis (S/). */
+export const FREE_SHIPPING_THRESHOLD = 150;
 
 /** Añade `qty` unidades del producto `id`, fusionando con una línea existente. */
 export function addLine(cart: CartLine[], id: number, qty = 1): CartLine[] {
@@ -28,7 +28,7 @@ export function cartCount(cart: CartLine[]): number {
   return cart.reduce((a, c) => a + c.qty, 0);
 }
 
-/** Subtotal del carrito en €. Ignora líneas con producto desconocido. */
+/** Subtotal del carrito en S/. Ignora líneas con producto desconocido. */
 export function subtotal(cart: CartLine[], products?: Map<number, Product>): number {
   return cart.reduce((a, c) => {
     const p = products ? products.get(c.id) : getProduct(c.id);
@@ -38,7 +38,7 @@ export function subtotal(cart: CartLine[], products?: Map<number, Product>): num
 
 export interface ShippingProgress {
   free: boolean;
-  /** Importe que falta para el envío gratis (€). */
+  /** Importe que falta para el envío gratis (S/). */
   remaining: number;
   /** Progreso 0-100 hacia el umbral. */
   pct: number;

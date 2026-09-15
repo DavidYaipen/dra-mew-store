@@ -23,7 +23,7 @@ describe('ProductCard', () => {
     const product = getProduct(1)!;
     renderWithStore(<ProductCard product={product} />);
     expect(screen.getByText('Peluche Mew 30 cm')).toBeInTheDocument();
-    expect(screen.getByText('34,99 €')).toBeInTheDocument();
+    expect(screen.getByText('S/ 34.99')).toBeInTheDocument();
     expect(screen.getByRole('link')).toHaveAttribute('href', '/producto/1');
   });
 
@@ -31,7 +31,7 @@ describe('ProductCard', () => {
     const product = getProduct(2)!; // Pikachu con oldPrice
     renderWithStore(<ProductCard product={product} showCategory />);
     expect(screen.getByText('-25%')).toBeInTheDocument();
-    expect(screen.getByText('39,99 €')).toBeInTheDocument();
+    expect(screen.getByText('S/ 39.99')).toBeInTheDocument();
   });
 
   it('añade al carrito sin navegar', async () => {

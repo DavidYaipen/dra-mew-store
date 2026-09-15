@@ -41,7 +41,7 @@ export default function CheckoutPage() {
     notes: '',
   });
 
-  const shippingCost = subtotal >= 35 ? 0 : 4.99;
+  const shippingCost = subtotal >= 150 ? 0 : 14.90;
   const total = Math.max(0, subtotal - couponDiscount + shippingCost);
 
   function updateField(field: string, value: string) {
@@ -355,7 +355,7 @@ export default function CheckoutPage() {
             <span className={styles.total}>{formatEuro(total)}</span>
           </div>
           {subtotal >= 35 && (
-            <div className={styles.freeShipping}>✓ Envío gratis por superar 35€</div>
+            <div className={styles.freeShipping}>✓ Envío gratis por superar S/ 150</div>
           )}
         </div>
       </div>

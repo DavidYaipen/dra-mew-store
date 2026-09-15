@@ -40,7 +40,7 @@ export const REVIEWS: Review[] = [
     name: 'Pedro Sánchez',
     rating: 5,
     comment:
-      'Tercera vez que compro aquí y siempre la misma calidad. Las cartas originales y a buen precio. El envío gratis por encima de 35 € es un detalle genial.',
+      'Tercera vez que compro aquí y siempre la misma calidad. Las cartas originales y a buen precio. El envío gratis por encima de S/ 150 es un detalle genial.',
     date: '5 de septiembre de 2026',
     product: 'Booster 151',
   },

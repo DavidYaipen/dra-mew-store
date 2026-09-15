@@ -25,8 +25,19 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  // Refresca la sesión si existe (importante para auth futura).
-  await supabase.auth.getUser();
+  // Refresca la sesión si existe.
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Proteger rutas autenticadas (excepto login/registro/api)
+  const protectedPaths = ['/cuenta', '/checkout', '/pedido'];
+  const isProtected = protectedPaths.some((p) => request.nextUrl.pathname.startsWith(p));
+
+  if (isProtected && !user) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/login';
+    url.searchParams.set('redirect', request.nextUrl.pathname);
+    return NextResponse.redirect(url);
+  }
 
   return supabaseResponse;
 }

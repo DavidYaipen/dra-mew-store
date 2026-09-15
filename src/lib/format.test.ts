@@ -1,11 +1,17 @@
 import { describe, it, expect } from 'vitest';
-import { discountLabel, formatEuro } from './format';
+import { formatPrice, formatEuro, discountLabel } from './format';
 
-describe('formatEuro', () => {
-  it('formatea con coma decimal y símbolo de euro', () => {
-    expect(formatEuro(34.99)).toBe('34,99 €');
-    expect(formatEuro(6.9)).toBe('6,90 €');
-    expect(formatEuro(0)).toBe('0,00 €');
+describe('formatPrice', () => {
+  it('formatea con punto decimal y símbolo de sol', () => {
+    expect(formatPrice(34.99)).toBe('S/ 34.99');
+    expect(formatPrice(6.9)).toBe('S/ 6.90');
+    expect(formatPrice(0)).toBe('S/ 0.00');
+  });
+});
+
+describe('formatEuro (alias)', () => {
+  it('es alias de formatPrice', () => {
+    expect(formatEuro(10)).toBe('S/ 10.00');
   });
 });
 

@@ -82,7 +82,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <h3>Cartas: Booster 151</h3>
 <p>El set más esperado del año ya está disponible. El Booster 151 incluye todas las especies originales de la primera generación en versiones actualizadas.</p>
 <h3>Ofertas de temporada</h3>
-<p>Durante todo septiembre tendrás envío gratis en pedidos superiores a 35 €. Además, hemos preparado descuentos exclusivos en artículos seleccionados.</p>
+<p>Durante todo septiembre tendrás envío gratis en pedidos superiores a S/ 150. Además, hemos preparado descuentos exclusivos en artículos seleccionados.</p>
 <p>¡No dejes pasar la oportunidad! Visita nuestra <a href="/productos">tienda</a> y descubre todas las novedades.</p>`,
     image: '/assets/thiings/lightning.png',
     category: 'Novedades',
@@ -102,7 +102,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <p>La ropa y accesorios Pokémon son perfectos para quienes quieren llevar su fandom a diario. Gorras, fundas para consola y camisetas con diseños originales.</p>
 <h3>Para quienes buscan algo único</h3>
 <p>Las cartas raras (como la Mew ex) son piezas de colección con valor sentimental y económico. Un regalo que recordarán siempre.</p>
-<p>En Dra. Mew Store encontrarás regalos para todos los presupuestos, desde 9,99 € hasta piezas premium. ¡Empieza a planificar tu lista!</p>`,
+<p>En Dra. Mew Store encontrarás regalos para todos los presupuestos, desde S/ 39.90 hasta piezas premium. ¡Empieza a planificar tu lista!</p>`,
     image: '/assets/thiings/heart.png',
     category: 'Regalos',
   },

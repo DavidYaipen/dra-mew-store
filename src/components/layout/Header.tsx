@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { useState, type KeyboardEvent } from 'react';
 import { useStore } from '@/store/useStore';
 import { Logo } from './Logo';
-import { SearchIcon, UserIcon, HeartIcon, CartIcon } from '@/components/ui/Icons';
+import { UserMenu } from './UserMenu';
+import { SearchIcon, HeartIcon, CartIcon } from '@/components/ui/Icons';
 import styles from './Header.module.css';
 
 /** Cabecera fija: logo, búsqueda y accesos a cuenta, favoritos y carrito. */
@@ -39,9 +40,7 @@ export function Header() {
       </div>
 
       <div className={styles.actions}>
-        <Link href="/cuenta" className={styles.iconBtn} aria-label="Mi cuenta">
-          <UserIcon size={21} />
-        </Link>
+        <UserMenu />
         <Link href="/favoritos" className={styles.iconBtn} aria-label="Favoritos">
           <HeartIcon size={21} />
           {wishCount > 0 && (

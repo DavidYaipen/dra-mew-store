@@ -1,0 +1,147 @@
+.page {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.email {
+  font-size: 14px;
+  color: var(--graphite-500);
+  margin: 4px 0 0;
+}
+
+.logoutBtn {
+  padding: 8px 16px;
+  background: none;
+  border: 1px solid var(--graphite-200);
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--graphite-600);
+}
+
+.logoutBtn:hover {
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+
+.empty {
+  padding: 32px;
+  background: var(--graphite-50);
+  border-radius: 12px;
+  text-align: center;
+  color: var(--graphite-500);
+}
+
+.shopLink {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 10px 20px;
+  background: var(--pink);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.orders {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.orderCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid var(--graphite-100);
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s;
+}
+
+.orderCard:hover {
+  border-color: var(--pink);
+}
+
+.orderInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.orderNum {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.orderDate {
+  font-size: 13px;
+  color: var(--graphite-500);
+}
+
+.orderMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.orderStatus {
+  font-size: 12px;
+  text-transform: capitalize;
+  color: var(--pink);
+  font-weight: 500;
+}
+
+.orderTotal {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.actionBtn {
+  padding: 12px 20px;
+  background: var(--graphite-50);
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--graphite-900);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.actionBtn:hover {
+  background: var(--graphite-100);
+}

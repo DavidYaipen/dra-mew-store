@@ -23,7 +23,7 @@ const ENVIOS: InfoCard[] = [
   {
     icon: 'shield.png',
     title: 'Costes de envío',
-    text: 'Gratis desde 35 €. Por debajo, una tarifa plana de 3,95 €.',
+    text: 'Gratis desde S/ 150. Por debajo, una tarifa plana de S/ 14.90.',
   },
   {
     icon: 'refresh.png',

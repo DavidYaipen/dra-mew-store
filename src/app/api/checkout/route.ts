@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
         const minOrder = (coupon as { min_order: number }).min_order ?? 0;
         if (subtotal < minOrder) {
           return NextResponse.json(
-            { error: `El pedido mínimo para este cupón es ${minOrder}€` },
+            { error: `El pedido mínimo para este cupón es S/ ${minOrder}` },
             { status: 400 },
           );
         }
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. Calcular envío
-    const shippingCost = subtotal >= 35 ? 0 : 4.99; // envío gratis > 35€
+    const shippingCost = subtotal >= 150 ? 0 : 14.90; // envío gratis > S/ 150
     const total = Math.max(0, subtotal - discount + shippingCost);
 
     // 5. Crear customer
@@ -166,9 +166,9 @@ function generateWhatsAppMessage(
   const lines = [
     `Hola! Quiero realizar el pedido #${orderNumber}:`,
     '',
-    ...items.map((item) => `• ${item.name} x${item.quantity} — €${(item.price * item.quantity).toFixed(2)}`),
+    ...items.map((item) => `• ${item.name} x${item.quantity} — S/ ${(item.price * item.quantity).toFixed(2)}`),
     '',
-    `Total: €${total.toFixed(2)}`,
+    `Total: S/ ${total.toFixed(2)}`,
     '',
     'Quisiera confirmar disponibilidad y método de pago. Gracias!',
   ];

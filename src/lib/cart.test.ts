@@ -83,7 +83,7 @@ describe('shippingProgress', () => {
   it('calcula lo que falta y el progreso por debajo del umbral', () => {
     const p = shippingProgress(20);
     expect(p.free).toBe(false);
-    expect(p.remaining).toBeCloseTo(15, 2);
-    expect(p.pct).toBe(57); // round(20/35*100)
+    expect(p.remaining).toBeCloseTo(130, 2);
+    expect(p.pct).toBe(13); // round(20/150*100)
   });
 });

@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { requireAdmin } from '@/lib/supabase/admin';
+
+function revalidateStorefront() {
+  revalidatePath('/');
+  revalidatePath('/productos');
+  revalidatePath('/producto/[id]', 'page');
+  revalidatePath('/categoria/[slug]', 'page');
+}
 
 export async function GET() {
   const { serviceClient } = await requireAdmin();
@@ -26,6 +34,7 @@ export async function POST(request: NextRequest) {
   });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  revalidateStorefront();
   return NextResponse.json({ ok: true });
 }
 
@@ -40,6 +49,7 @@ export async function PUT(request: NextRequest) {
     .eq('id', id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  revalidateStorefront();
   return NextResponse.json({ ok: true });
 }
 
@@ -52,5 +62,6 @@ export async function DELETE(request: NextRequest) {
 
   const { error } = await serviceClient.from('products').delete().eq('id', Number(id));
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  revalidateStorefront();
   return NextResponse.json({ ok: true });
 }

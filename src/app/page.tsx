@@ -3,6 +3,8 @@ import { CategoryShowcase } from '@/components/home/CategoryShowcase';
 import { LimitedSpotlight } from '@/components/home/LimitedSpotlight';
 import { TrustBadges } from '@/components/home/TrustBadges';
 
+export const revalidate = 60;
+
 export default function HomePage() {
   return (
     <>

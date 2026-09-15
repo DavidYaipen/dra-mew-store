@@ -1,5 +1,5 @@
-import { unstable_cache } from 'next/cache';
-import { createClient } from '@/lib/supabase/server';
+import { cache } from 'react';
+import { createServiceClient } from '@/lib/supabase/service';
 import type { Product, Category } from '@/lib/types';
 
 interface ProductRow {
@@ -29,19 +29,15 @@ function rowToProduct(row: ProductRow): Product {
   };
 }
 
-export const getCatalog = unstable_cache(
-  async (): Promise<Product[]> => {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .order('id');
-    if (error) throw new Error(`Failed to fetch catalog: ${error.message}`);
-    return (data as ProductRow[]).map(rowToProduct);
-  },
-  ['catalog'],
-  { revalidate: 60, tags: ['catalog'] },
-);
+export const getCatalog = cache(async (): Promise<Product[]> => {
+  const supabase = createServiceClient();
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .order('id');
+  if (error) throw new Error(`Failed to fetch catalog: ${error.message}`);
+  return (data as ProductRow[]).map(rowToProduct);
+});
 
 export async function getProductFromDB(id: number): Promise<Product | undefined> {
   const catalog = await getCatalog();
@@ -62,20 +58,16 @@ export async function relatedProductsFromDB(
   return related.slice(0, limit);
 }
 
-export const getFeaturedProducts = unstable_cache(
-  async (): Promise<Product[]> => {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('is_featured', true)
-      .order('id');
-    if (error) throw new Error(`Failed to fetch featured: ${error.message}`);
-    return (data as ProductRow[]).map(rowToProduct);
-  },
-  ['featured'],
-  { revalidate: 60, tags: ['catalog'] },
-);
+export const getFeaturedProducts = cache(async (): Promise<Product[]> => {
+  const supabase = createServiceClient();
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('is_featured', true)
+    .order('id');
+  if (error) throw new Error(`Failed to fetch featured: ${error.message}`);
+  return (data as ProductRow[]).map(rowToProduct);
+});
 
 export interface CategoryCount {
   name: Category;
@@ -92,30 +84,26 @@ const CATEGORY_META: Record<Category, { image: string; tint: string }> = {
   Accesorios: { image: '/assets/thiings/console.png', tint: 'var(--graphite-100)' },
 };
 
-export const getCategoryCounts = unstable_cache(
-  async (): Promise<CategoryCount[]> => {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from('products')
-      .select('cat')
-      .order('cat');
-    if (error) throw new Error(`Failed to fetch category counts: ${error.message}`);
+export const getCategoryCounts = cache(async (): Promise<CategoryCount[]> => {
+  const supabase = createServiceClient();
+  const { data, error } = await supabase
+    .from('products')
+    .select('cat')
+    .order('cat');
+  if (error) throw new Error(`Failed to fetch category counts: ${error.message}`);
 
-    const counts = new Map<string, number>();
-    for (const row of data as { cat: string }[]) {
-      counts.set(row.cat, (counts.get(row.cat) ?? 0) + 1);
-    }
+  const counts = new Map<string, number>();
+  for (const row of data as { cat: string }[]) {
+    counts.set(row.cat, (counts.get(row.cat) ?? 0) + 1);
+  }
 
-    const allCategories: Category[] = ['Peluches', 'Figuras', 'Cartas', 'Ropa', 'Accesorios'];
-    return allCategories
-      .filter((cat) => counts.has(cat))
-      .map((cat) => ({
-        name: cat,
-        count: counts.get(cat)!,
-        image: CATEGORY_META[cat].image,
-        tint: CATEGORY_META[cat].tint,
-      }));
-  },
-  ['category-counts'],
-  { revalidate: 60, tags: ['catalog'] },
-);
+  const allCategories: Category[] = ['Peluches', 'Figuras', 'Cartas', 'Ropa', 'Accesorios'];
+  return allCategories
+    .filter((cat) => counts.has(cat))
+    .map((cat) => ({
+      name: cat,
+      count: counts.get(cat)!,
+      image: CATEGORY_META[cat].image,
+      tint: CATEGORY_META[cat].tint,
+    }));
+});

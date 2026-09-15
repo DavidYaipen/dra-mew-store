@@ -1,0 +1,67 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import {
+  DashboardIcon,
+  PackageIcon,
+  ShoppingCartIcon,
+  TagIcon,
+  UsersIcon,
+  StarIcon,
+  BoxIcon,
+} from '@/components/admin/AdminIcons';
+
+const NAV_ITEMS = [
+  { href: '/admin', label: 'Dashboard', icon: DashboardIcon },
+  { href: '/admin/productos', label: 'Productos', icon: PackageIcon },
+  { href: '/admin/pedidos', label: 'Pedidos', icon: ShoppingCartIcon },
+  { href: '/admin/cupones', label: 'Cupones', icon: TagIcon },
+  { href: '/admin/clientes', label: 'Clientes', icon: UsersIcon },
+  { href: '/admin/resenas', label: 'Resenas', icon: StarIcon },
+  { href: '/admin/inventario', label: 'Inventario', icon: BoxIcon },
+];
+
+export function AdminSidebar() {
+  const pathname = usePathname();
+
+  return (
+    <aside className="admin-sidebar">
+      <div className="sidebar-logo">
+        <h2>Dra. Mew</h2>
+        <span>Admin Panel</span>
+      </div>
+
+      <nav className="sidebar-nav">
+        <div className="sidebar-section">
+          <div className="sidebar-section-title">Menu</div>
+          {NAV_ITEMS.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="sidebar-link"
+              data-active={
+                item.href === '/admin'
+                  ? pathname === '/admin'
+                  : pathname.startsWith(item.href)
+              }
+            >
+              <item.icon size={18} />
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      </nav>
+
+      <div className="sidebar-footer">
+        <div className="sidebar-user">
+          <div className="sidebar-avatar">A</div>
+          <div className="sidebar-user-info">
+            <div className="sidebar-user-name">Admin</div>
+            <div className="sidebar-user-email">dra.mew.store</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  );
+}

@@ -1,6 +1,11 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || '')
+  .split(',')
+  .map((e) => e.trim().toLowerCase())
+  .filter(Boolean);
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -25,17 +30,41 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  // Refresca la sesión si existe.
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  // Proteger rutas autenticadas (excepto login/registro/api)
+  const pathname = request.nextUrl.pathname;
+
+  // Proteger rutas de admin
+  if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
+    if (!user) {
+      if (pathname.startsWith('/api/admin')) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      const url = request.nextUrl.clone();
+      url.pathname = '/login';
+      url.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(url);
+    }
+
+    const isAdmin = ADMIN_EMAILS.includes(user.email?.toLowerCase() || '');
+    if (!isAdmin) {
+      if (pathname.startsWith('/api/admin')) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+  }
+
+  // Proteger rutas autenticadas
   const protectedPaths = ['/cuenta', '/checkout', '/pedido'];
-  const isProtected = protectedPaths.some((p) => request.nextUrl.pathname.startsWith(p));
+  const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
 
   if (isProtected && !user) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
-    url.searchParams.set('redirect', request.nextUrl.pathname);
+    url.searchParams.set('redirect', pathname);
     return NextResponse.redirect(url);
   }
 
@@ -48,13 +77,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Matcha todas las rutas excepto:
-     * - _next/static (archivos estáticos)
-     * - _next/image (optimización de imágenes)
-     * - favicon.ico
-     * - archivos públicos (images, etc.)
-     */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

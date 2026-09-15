@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useStore } from '@/store/useStore';
-import { formatEuro } from '@/lib/format';
+import { formatPrice } from '@/lib/format';
 import { CouponInput } from '@/components/cart/CouponInput';
 import styles from './page.module.css';
 
@@ -35,7 +35,7 @@ export default function CheckoutPage() {
     city: '',
     state: '',
     zip: '',
-    country: 'España',
+    country: 'Peru',
     shipping_method: 'standard',
     payment_method: 'whatsapp',
     notes: '',
@@ -43,6 +43,13 @@ export default function CheckoutPage() {
 
   const shippingCost = subtotal >= 150 ? 0 : 14.90;
   const total = Math.max(0, subtotal - couponDiscount + shippingCost);
+
+  // Redirect to WhatsApp after order
+  useEffect(() => {
+    if (result?.whatsapp_url) {
+      window.location.href = result.whatsapp_url;
+    }
+  }, [result]);
 
   function updateField(field: string, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -107,14 +114,17 @@ export default function CheckoutPage() {
         <div className={styles.result}>
           <div className={styles.checkIcon}>✓</div>
           <h1>¡Pedido #{result.order_number} confirmado!</h1>
-          <p className={styles.total}>Total: {formatEuro(result.total)}</p>
+          <p className={styles.total}>Total: {formatPrice(result.total)}</p>
+          <p className={styles.note} style={{ marginBottom: 16 }}>
+            Redirigiendo a WhatsApp...
+          </p>
           <a
             href={result.whatsapp_url}
             target="_blank"
             rel="noopener noreferrer"
             className={styles.whatsappBtn}
           >
-            📱 Enviar por WhatsApp
+            Si no se abrió, haz clic aquí para enviar por WhatsApp
           </a>
           <p className={styles.note}>
             También puedes buscar tu pedido con el número #{result.order_number} y tu email.
@@ -170,7 +180,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className={styles.field}>
                   <label>Teléfono *</label>
-                  <input type="tel" value={form.phone} onChange={(e) => updateField('phone', e.target.value)} required />
+                  <input type="tel" value={form.phone} onChange={(e) => updateField('phone', e.target.value)} required placeholder="956 455 973" />
                 </div>
               </div>
               <button
@@ -190,7 +200,7 @@ export default function CheckoutPage() {
               <h2 className={styles.sectionTitle}>Dirección de envío</h2>
               <div className={styles.field}>
                 <label>Dirección *</label>
-                <input value={form.street} onChange={(e) => updateField('street', e.target.value)} required />
+                <input value={form.street} onChange={(e) => updateField('street', e.target.value)} required placeholder="Calle, número, urbanización" />
               </div>
               <div className={styles.fieldRow}>
                 <div className={styles.field}>
@@ -204,8 +214,8 @@ export default function CheckoutPage() {
               </div>
               <div className={styles.fieldRow}>
                 <div className={styles.field}>
-                  <label>Código postal *</label>
-                  <input value={form.zip} onChange={(e) => updateField('zip', e.target.value)} required />
+                  <label>Código postal</label>
+                  <input value={form.zip} onChange={(e) => updateField('zip', e.target.value)} />
                 </div>
                 <div className={styles.field}>
                   <label>País</label>
@@ -223,7 +233,7 @@ export default function CheckoutPage() {
                     checked={form.shipping_method === 'standard'}
                     onChange={(e) => updateField('shipping_method', e.target.value)}
                   />
-                  <span>Estándar (3-5 días) — {shippingCost === 0 ? 'Gratis' : formatEuro(shippingCost)}</span>
+                  <span>Delivery — {shippingCost === 0 ? 'Gratis' : formatPrice(shippingCost)}</span>
                 </label>
                 <label className={styles.radio}>
                   <input
@@ -233,7 +243,7 @@ export default function CheckoutPage() {
                     checked={form.shipping_method === 'express'}
                     onChange={(e) => updateField('shipping_method', e.target.value)}
                   />
-                  <span>Express (1-2 días) — {formatEuro(shippingCost + 5)}</span>
+                  <span>Express (1-2 días) — {formatPrice(shippingCost + 5)}</span>
                 </label>
               </div>
 
@@ -245,7 +255,7 @@ export default function CheckoutPage() {
                   type="button"
                   className={styles.nextBtn}
                   onClick={() => setStep('payment')}
-                  disabled={!form.street || !form.city || !form.state || !form.zip}
+                  disabled={!form.street || !form.city || !form.state}
                 >
                   Siguiente →
                 </button>
@@ -292,7 +302,7 @@ export default function CheckoutPage() {
 
               <div className={styles.field}>
                 <label>Notas (opcional)</label>
-                <textarea value={form.notes} onChange={(e) => updateField('notes', e.target.value)} rows={3} />
+                <textarea value={form.notes} onChange={(e) => updateField('notes', e.target.value)} rows={3} placeholder="Instrucciones especiales, referencias de entrega..." />
               </div>
 
               <div className={styles.btnRow}>
@@ -323,7 +333,7 @@ export default function CheckoutPage() {
                 <span className={styles.itemName}>
                   {product.name} × {line.qty}
                 </span>
-                <span>{formatEuro(product.price * line.qty)}</span>
+                <span>{formatPrice(product.price * line.qty)}</span>
               </div>
             );
           })}
@@ -338,23 +348,23 @@ export default function CheckoutPage() {
 
           <div className={styles.summaryRow}>
             <span>Subtotal</span>
-            <span>{formatEuro(subtotal)}</span>
+            <span>{formatPrice(subtotal)}</span>
           </div>
           {couponDiscount > 0 && (
             <div className={styles.summaryRow}>
               <span>Descuento</span>
-              <span className={styles.discount}>-{formatEuro(couponDiscount)}</span>
+              <span className={styles.discount}>-{formatPrice(couponDiscount)}</span>
             </div>
           )}
           <div className={styles.summaryRow}>
             <span>Envío</span>
-            <span>{shippingCost === 0 ? 'Gratis' : formatEuro(shippingCost)}</span>
+            <span>{shippingCost === 0 ? 'Gratis' : formatPrice(shippingCost)}</span>
           </div>
           <div className={styles.totalRow}>
             <span>Total</span>
-            <span className={styles.total}>{formatEuro(total)}</span>
+            <span className={styles.total}>{formatPrice(total)}</span>
           </div>
-          {subtotal >= 35 && (
+          {subtotal >= 150 && (
             <div className={styles.freeShipping}>✓ Envío gratis por superar S/ 150</div>
           )}
         </div>

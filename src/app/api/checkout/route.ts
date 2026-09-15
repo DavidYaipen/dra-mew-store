@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import type { CheckoutPayload } from '@/lib/types';
 
-const STORE_PHONE = '34600000000'; // número de WhatsApp de la tienda
+const STORE_PHONE = '51975625359'; // WhatsApp de la tienda
+const STORE_URL = 'https://cactusdetallestrujillo.tiendada.com';
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,13 +33,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Cupón agotado' }, { status: 400 });
       }
 
-      // Calcular descuento
-      const cartTotal = payload.cart.reduce((acc, line) => acc + line.qty * 0, 0); // precio se calcula abajo
-      if (coupon.discount_type === 'percentage') {
-        discount = (cartTotal * coupon.discount_value) / 100;
-      } else {
-        discount = coupon.discount_value;
-      }
       couponId = coupon.id;
     }
 
@@ -69,7 +63,7 @@ export async function POST(request: NextRequest) {
       };
     });
 
-    // Recalcular descuento con subtotal real
+    // 4. Recalcular descuento con subtotal real
     if (payload.coupon_code && couponId) {
       const { data: coupon } = await supabase
         .from('coupons')
@@ -92,11 +86,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 4. Calcular envío
-    const shippingCost = subtotal >= 150 ? 0 : 14.90; // envío gratis > S/ 150
+    // 5. Calcular envío
+    const shippingCost = subtotal >= 150 ? 0 : 14.90;
     const total = Math.max(0, subtotal - discount + shippingCost);
 
-    // 5. Crear customer
+    // 6. Crear customer
     const { data: customer, error: customerError } = await supabase
       .from('customers')
       .upsert(
@@ -108,7 +102,7 @@ export async function POST(request: NextRequest) {
 
     if (customerError) throw customerError;
 
-    // 6. Crear order
+    // 7. Crear order
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
@@ -128,7 +122,7 @@ export async function POST(request: NextRequest) {
 
     if (orderError) throw orderError;
 
-    // 7. Crear order items
+    // 8. Crear order items
     const orderItems = items.map((item) => ({
       order_id: order.id,
       ...item,
@@ -137,13 +131,34 @@ export async function POST(request: NextRequest) {
     const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
     if (itemsError) throw itemsError;
 
-    // 8. Actualizar uso del cupón
+    // 9. Actualizar uso del cupón
     if (couponId) {
       await supabase.rpc('increment_coupon_usage' as never, { coupon_id: couponId } as never);
     }
 
-    // 9. Generar mensaje de WhatsApp
-    const whatsappMessage = generateWhatsAppMessage(order.order_number, items, total);
+    // 10. Generar mensaje de WhatsApp
+    const shippingLabel = payload.shipping_method === 'express' ? 'Express' : 'Delivery';
+    const addressParts = [
+      payload.shipping_address.street,
+      payload.shipping_address.city,
+      payload.shipping_address.state,
+      payload.shipping_address.country,
+    ].filter(Boolean);
+    const fullAddress = addressParts.join(', ') || 'No especificada';
+
+    const whatsappMessage = generateWhatsAppMessage({
+      orderNumber: order.order_number,
+      customerName: payload.customer.name,
+      customerPhone: payload.customer.phone,
+      customerEmail: payload.customer.email,
+      shippingMethod: shippingLabel,
+      address: fullAddress,
+      items,
+      subtotal,
+      shippingCost,
+      total,
+    });
+
     const whatsappUrl = `https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(whatsappMessage)}`;
 
     return NextResponse.json({
@@ -158,19 +173,58 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function generateWhatsAppMessage(
-  orderNumber: number,
-  items: Array<{ name: string; price: number; quantity: number }>,
-  total: number,
-): string {
+function generateWhatsAppMessage({
+  orderNumber,
+  customerName,
+  customerPhone,
+  customerEmail,
+  shippingMethod,
+  address,
+  items,
+  subtotal,
+  shippingCost,
+  total,
+}: {
+  orderNumber: number;
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  shippingMethod: string;
+  address: string;
+  items: Array<{ name: string; price: number; quantity: number; product_id: number }>;
+  subtotal: number;
+  shippingCost: number;
+  total: number;
+}): string {
+  const productLines = items
+    .map((item) => {
+      const itemTotal = (item.price * item.quantity).toFixed(2);
+      const productUrl = `${STORE_URL}/producto/${item.product_id}`;
+      return `• ${item.name} - ${item.quantity} un. - S/ ${itemTotal} - ${productUrl}`;
+    })
+    .join('\n');
+
+  const shippingLine = shippingCost === 0 ? 'Gratis' : `S/ ${shippingCost.toFixed(2)}`;
+
   const lines = [
-    `Hola! Quiero realizar el pedido #${orderNumber}:`,
-    '',
-    ...items.map((item) => `• ${item.name} x${item.quantity} — S/ ${(item.price * item.quantity).toFixed(2)}`),
-    '',
+    `Hola! Acabo de realizar el siguiente pedido:`,
+    ``,
+    `Nombre: ${customerName}`,
+    `Celular: ${customerPhone}`,
+    `Pedido: OR-${String(orderNumber).padStart(6, '0')}`,
+    `Método de entrega: ${shippingMethod}`,
+    `Dirección: ${address}`,
+    `Correo: ${customerEmail}`,
+    ``,
+    `Productos:`,
+    productLines,
+    ``,
+    `Subtotal: S/ ${subtotal.toFixed(2)}`,
+    `Envío: ${shippingLine}`,
     `Total: S/ ${total.toFixed(2)}`,
-    '',
-    'Quisiera confirmar disponibilidad y método de pago. Gracias!',
+    ``,
+    `Me gustaría saber los métodos de pago.`,
   ];
+
   return lines.join('\n');
 }

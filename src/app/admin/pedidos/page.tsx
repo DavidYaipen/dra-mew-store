@@ -14,9 +14,9 @@ interface OrderWithCustomer {
 }
 
 export default async function AdminOrdersPage() {
-  const { supabase } = await requireAdmin();
+  const { serviceClient } = await requireAdmin();
 
-  const { data: orders } = await supabase
+  const { data: orders } = await serviceClient
     .from('orders')
     .select('*, customers(name, email)')
     .order('created_at', { ascending: false });

@@ -6,9 +6,9 @@ import { CreateCouponForm } from '@/components/admin/CreateCouponForm';
 export const dynamic = 'force-dynamic';
 
 export default async function AdminCouponsPage() {
-  const { supabase } = await requireAdmin();
+  const { serviceClient } = await requireAdmin();
 
-  const { data: coupons } = await supabase
+  const { data: coupons } = await serviceClient
     .from('coupons')
     .select('*')
     .order('created_at', { ascending: false });

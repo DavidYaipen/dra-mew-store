@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { createServiceClient } from '@/lib/supabase/service';
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || '')
   .split(',')
@@ -17,5 +18,8 @@ export async function requireAdmin() {
   const isAdmin = ADMIN_EMAILS.includes(user.email?.toLowerCase() || '');
   if (!isAdmin) redirect('/');
 
-  return { user, supabase };
+  // Service client para lectura de datos (admin tiene acceso total)
+  const serviceClient = createServiceClient();
+
+  return { user, supabase, serviceClient };
 }

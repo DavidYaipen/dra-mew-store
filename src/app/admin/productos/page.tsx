@@ -7,14 +7,14 @@ import { AdminProductActions } from '@/components/admin/AdminProductActions';
 export const dynamic = 'force-dynamic';
 
 export default async function AdminProductsPage() {
-  const { supabase } = await requireAdmin();
+  const { serviceClient } = await requireAdmin();
 
-  const { data: products } = await supabase
+  const { data: products, error: productsError } = await serviceClient
     .from('products')
     .select('*')
     .order('id');
 
-  const { data: variants } = await supabase
+  const { data: variants } = await serviceClient
     .from('product_variants')
     .select('product_id, stock');
 
@@ -22,6 +22,10 @@ export default async function AdminProductsPage() {
   for (const v of variants || []) {
     const pid = v.product_id;
     stockByProduct.set(pid, (stockByProduct.get(pid) || 0) + v.stock);
+  }
+
+  if (productsError) {
+    console.error('Error fetching products:', productsError);
   }
 
   return (
@@ -38,6 +42,12 @@ export default async function AdminProductsPage() {
           Nuevo producto
         </Link>
       </div>
+
+      {productsError && (
+        <div style={{ padding: 16, background: '#fee2e2', color: '#991b1b', borderRadius: 12, marginBottom: 16 }}>
+          Error al cargar productos: {productsError.message}
+        </div>
+      )}
 
       <div className="admin-card" style={{ padding: 0, overflow: 'hidden' }}>
         <div style={{ overflowX: 'auto' }}>

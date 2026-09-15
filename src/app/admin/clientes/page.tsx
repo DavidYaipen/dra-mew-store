@@ -3,14 +3,14 @@ import { requireAdmin } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 
 export default async function AdminCustomersPage() {
-  const { supabase } = await requireAdmin();
+  const { serviceClient } = await requireAdmin();
 
-  const { data: customers } = await supabase
+  const { data: customers } = await serviceClient
     .from('customers')
     .select('*')
     .order('created_at', { ascending: false });
 
-  const { data: orders } = await supabase
+  const { data: orders } = await serviceClient
     .from('orders')
     .select('customer_id, total');
 

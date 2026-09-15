@@ -11,12 +11,14 @@ import { RecentOrdersTable } from '@/components/admin/RecentOrdersTable';
 
 export const dynamic = 'force-dynamic';
 
-async function getDashboardStats(supabase: ReturnType<typeof requireAdmin> extends Promise<infer R> ? R extends { supabase: infer S } ? S : never : never) {
+export default async function AdminDashboardPage() {
+  const { serviceClient } = await requireAdmin();
+
   const [ordersResult, customersResult, productsResult, reviewsResult] = await Promise.all([
-    supabase.from('orders').select('id, total, status, created_at, payment_status').order('created_at', { ascending: false }),
-    supabase.from('customers').select('id, created_at'),
-    supabase.from('products').select('id, name, price, cat'),
-    supabase.from('reviews').select('id, rating, approved'),
+    serviceClient.from('orders').select('id, total, status, created_at, payment_status').order('created_at', { ascending: false }),
+    serviceClient.from('customers').select('id, created_at'),
+    serviceClient.from('products').select('id, name, price, cat'),
+    serviceClient.from('reviews').select('id, rating, approved'),
   ]);
 
   const orders = ordersResult.data || [];
@@ -48,28 +50,6 @@ async function getDashboardStats(supabase: ReturnType<typeof requireAdmin> exten
     catCounts[p.cat] = (catCounts[p.cat] || 0) + 1;
   }
 
-  return {
-    totalRevenue,
-    totalOrders: orders.length,
-    totalCustomers: customers.length,
-    totalProducts: products.length,
-    pendingOrders,
-    pendingReviews,
-    recentRevenue,
-    recentOrderCount: recentOrders.length,
-    statusCounts,
-    categoryCounts: catCounts,
-    orders: orders.slice(0, 10),
-    avgRating: reviews.length
-      ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
-      : '0',
-  };
-}
-
-export default async function AdminDashboardPage() {
-  const { supabase } = await requireAdmin();
-  const stats = await getDashboardStats(supabase);
-
   return (
     <div>
       <div className="stats-grid">
@@ -79,9 +59,9 @@ export default async function AdminDashboardPage() {
           </div>
           <div className="stat-info">
             <div className="stat-label">Ingresos totales</div>
-            <div className="stat-value">{formatPrice(stats.totalRevenue)}</div>
+            <div className="stat-value">{formatPrice(totalRevenue)}</div>
             <div className="stat-change" data-positive="true">
-              {formatPrice(stats.recentRevenue)} ultimos 30 dias
+              {formatPrice(recentRevenue)} ultimos 30 dias
             </div>
           </div>
         </div>
@@ -92,9 +72,9 @@ export default async function AdminDashboardPage() {
           </div>
           <div className="stat-info">
             <div className="stat-label">Pedidos totales</div>
-            <div className="stat-value">{stats.totalOrders}</div>
+            <div className="stat-value">{orders.length}</div>
             <div className="stat-change" data-positive="true">
-              {stats.pendingOrders} pendientes
+              {pendingOrders} pendientes
             </div>
           </div>
         </div>
@@ -105,7 +85,7 @@ export default async function AdminDashboardPage() {
           </div>
           <div className="stat-info">
             <div className="stat-label">Clientes</div>
-            <div className="stat-value">{stats.totalCustomers}</div>
+            <div className="stat-value">{customers.length}</div>
           </div>
         </div>
 
@@ -115,9 +95,9 @@ export default async function AdminDashboardPage() {
           </div>
           <div className="stat-info">
             <div className="stat-label">Productos</div>
-            <div className="stat-value">{stats.totalProducts}</div>
+            <div className="stat-value">{products.length}</div>
             <div className="stat-change" data-positive="false">
-              {stats.pendingReviews} resenas pendientes
+              {pendingReviews} resenas pendientes
             </div>
           </div>
         </div>
@@ -131,7 +111,7 @@ export default async function AdminDashboardPage() {
               Ver todos
             </Link>
           </div>
-          <RecentOrdersTable orders={stats.orders} />
+          <RecentOrdersTable orders={orders.slice(0, 10)} />
         </div>
 
         <div className="admin-card">
@@ -141,7 +121,7 @@ export default async function AdminDashboardPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div>
               <div style={{ fontSize: 13, color: 'var(--text-faint)', marginBottom: 8 }}>Estado de pedidos</div>
-              {Object.entries(stats.statusCounts).map(([status, count]) => (
+              {Object.entries(statusCounts).map(([status, count]) => (
                 <div key={status} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border-soft)' }}>
                   <span className="status-badge" data-status={status}>{status}</span>
                   <span className="mono" style={{ fontWeight: 600 }}>{count}</span>
@@ -150,7 +130,7 @@ export default async function AdminDashboardPage() {
             </div>
             <div>
               <div style={{ fontSize: 13, color: 'var(--text-faint)', marginBottom: 8 }}>Por categoria</div>
-              {Object.entries(stats.categoryCounts).map(([cat, count]) => (
+              {Object.entries(catCounts).map(([cat, count]) => (
                 <div key={cat} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border-soft)' }}>
                   <span>{cat}</span>
                   <span className="mono" style={{ fontWeight: 600 }}>{count}</span>
@@ -160,7 +140,7 @@ export default async function AdminDashboardPage() {
             <div style={{ textAlign: 'center', padding: 12, background: 'var(--graphite-50)', borderRadius: 12 }}>
               <div style={{ fontSize: 13, color: 'var(--text-faint)' }}>Rating promedio</div>
               <div style={{ fontSize: 24, fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#f59e0b' }}>
-                {stats.avgRating} ★
+                {reviews.length ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1) : '0'} ★
               </div>
             </div>
           </div>

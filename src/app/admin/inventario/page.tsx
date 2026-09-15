@@ -15,19 +15,19 @@ interface MovementWithProduct {
 }
 
 export default async function AdminInventoryPage() {
-  const { supabase } = await requireAdmin();
+  const { serviceClient } = await requireAdmin();
 
-  const { data: products } = await supabase
+  const { data: products } = await serviceClient
     .from('products')
     .select('id, name, cat')
     .order('name');
 
-  const { data: variants } = await supabase
+  const { data: variants } = await serviceClient
     .from('product_variants')
     .select('*')
     .order('created_at', { ascending: false });
 
-  const { data: movements } = await supabase
+  const { data: movements } = await serviceClient
     .from('inventory_movements')
     .select('*, products(name)')
     .order('created_at', { ascending: false })

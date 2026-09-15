@@ -15,9 +15,9 @@ interface ReviewWithProduct {
 }
 
 export default async function AdminReviewsPage() {
-  const { supabase } = await requireAdmin();
+  const { serviceClient } = await requireAdmin();
 
-  const { data: reviews } = await supabase
+  const { data: reviews } = await serviceClient
     .from('reviews')
     .select('*, products(name)')
     .order('created_at', { ascending: false });

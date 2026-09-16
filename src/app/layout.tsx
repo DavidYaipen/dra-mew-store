@@ -1,16 +1,10 @@
 import type { Metadata } from 'next';
-import { Suspense } from 'react';
 import { Manrope, Instrument_Serif, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { STORE_NAME } from '@/lib/constants';
 import { StoreProvider } from '@/store/StoreProvider';
-import { AnnouncementBar } from '@/components/layout/AnnouncementBar';
-import { Header } from '@/components/layout/Header';
-import { CategoryNav } from '@/components/layout/CategoryNav';
-import { Footer } from '@/components/layout/Footer';
+import { AppChrome } from '@/components/layout/AppChrome';
 import { Toast } from '@/components/layout/Toast';
-import { BackToTop } from '@/components/layout/BackToTop';
-import { FloatingWhatsApp } from '@/components/layout/FloatingWhatsApp';
 import { AnalyticsScripts } from '@/components/layout/AnalyticsScripts';
 
 const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope', display: 'swap' });
@@ -49,16 +43,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <AnalyticsScripts />
         <StoreProvider>
-          <AnnouncementBar />
-          <Header />
-          <Suspense fallback={null}>
-            <CategoryNav />
-          </Suspense>
-          <main style={{ minHeight: '62vh' }}>{children}</main>
-          <Footer />
+          <AppChrome>{children}</AppChrome>
           <Toast />
-          <BackToTop />
-          <FloatingWhatsApp />
         </StoreProvider>
       </body>
     </html>

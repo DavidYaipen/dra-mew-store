@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/supabase/admin';
+import { isForeignKeyViolation } from '@/lib/supabase/errors';
 
 export async function GET() {
   const { serviceClient } = await requireAdmin();
@@ -56,7 +57,15 @@ export async function DELETE(request: NextRequest) {
   if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
 
   const { data, error } = await serviceClient.from('coupons').delete().eq('id', id).select('id');
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    if (isForeignKeyViolation(error)) {
+      return NextResponse.json(
+        { error: 'No se puede eliminar: este cupon esta siendo usado en pedidos existentes.' },
+        { status: 409 },
+      );
+    }
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
   if (!data?.length) {
     return NextResponse.json({ error: 'No se encontro el cupon' }, { status: 404 });
   }

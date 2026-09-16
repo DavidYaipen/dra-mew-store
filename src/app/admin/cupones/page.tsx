@@ -60,7 +60,7 @@ export default async function AdminCouponsPage() {
                     </span>
                   </td>
                   <td>
-                    <AdminCouponActions couponId={coupon.id} active={coupon.active} />
+                    <AdminCouponActions couponId={coupon.id} couponCode={coupon.code} active={coupon.active} />
                   </td>
                 </tr>
               ))}

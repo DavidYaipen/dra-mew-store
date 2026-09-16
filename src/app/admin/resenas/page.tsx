@@ -70,7 +70,11 @@ export default async function AdminReviewsPage() {
                         {new Date(review.created_at).toLocaleDateString('es-PE')}
                       </td>
                       <td>
-                        <AdminReviewActions reviewId={review.id} />
+                        <AdminReviewActions
+                          reviewId={review.id}
+                          customerName={review.customer_name}
+                          productName={review.products?.name}
+                        />
                       </td>
                     </tr>
                   ))}
@@ -115,7 +119,12 @@ export default async function AdminReviewsPage() {
                       {new Date(review.created_at).toLocaleDateString('es-PE')}
                     </td>
                     <td>
-                      <AdminReviewActions reviewId={review.id} approved />
+                      <AdminReviewActions
+                        reviewId={review.id}
+                        customerName={review.customer_name}
+                        productName={review.products?.name}
+                        approved
+                      />
                     </td>
                   </tr>
                 ))}

@@ -147,7 +147,7 @@ export default async function AdminProductsPage() {
                       )}
                     </td>
                     <td>
-                      <AdminProductActions productId={product.id} />
+                      <AdminProductActions productId={product.id} productName={product.name} />
                     </td>
                   </tr>
                 );

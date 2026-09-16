@@ -1,4 +1,5 @@
 import { requireAdmin } from '@/lib/supabase/admin';
+import { AdminCustomerActions } from '@/components/admin/AdminCustomerActions';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,6 +46,7 @@ export default async function AdminCustomersPage() {
                 <th>Pedidos</th>
                 <th>Total gastado</th>
                 <th>Registro</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -59,6 +61,9 @@ export default async function AdminCustomersPage() {
                     <td className="mono" style={{ fontWeight: 600 }}>S/ {stats.total.toFixed(2)}</td>
                     <td style={{ fontSize: 12, color: 'var(--text-faint)' }}>
                       {new Date(customer.created_at).toLocaleDateString('es-PE')}
+                    </td>
+                    <td>
+                      <AdminCustomerActions customerId={customer.id} customerName={customer.name} />
                     </td>
                   </tr>
                 );

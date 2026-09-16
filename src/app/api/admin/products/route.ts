@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { requireAdmin } from '@/lib/supabase/admin';
+import { isForeignKeyViolation } from '@/lib/supabase/errors';
 
 function revalidateStorefront() {
   revalidatePath('/');
@@ -125,7 +126,15 @@ export async function DELETE(request: NextRequest) {
     .delete()
     .eq('id', Number(id))
     .select('id');
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    if (isForeignKeyViolation(error)) {
+      return NextResponse.json(
+        { error: 'No se puede eliminar: este producto tiene pedidos asociados.' },
+        { status: 409 },
+      );
+    }
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
   if (!data?.length) {
     return NextResponse.json({ error: 'No se encontro el producto' }, { status: 404 });
   }

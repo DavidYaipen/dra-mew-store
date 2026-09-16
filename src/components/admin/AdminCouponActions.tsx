@@ -3,10 +3,22 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { CheckIcon, TrashIcon } from '@/components/admin/AdminIcons';
+import { ConfirmDeleteModal } from '@/components/admin/ConfirmDeleteModal';
 
-export function AdminCouponActions({ couponId, active }: { couponId: string; active: boolean }) {
+export function AdminCouponActions({
+  couponId,
+  couponCode,
+  active,
+}: {
+  couponId: string;
+  couponCode: string;
+  active: boolean;
+}) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const toggleActive = async () => {
     setLoading(true);
@@ -30,44 +42,63 @@ export function AdminCouponActions({ couponId, active }: { couponId: string; act
   };
 
   const handleDelete = async () => {
-    if (!confirm('Eliminar este cupon?')) return;
-    setLoading(true);
+    setDeleting(true);
+    setError(null);
     try {
       const res = await fetch(`/api/admin/coupons?id=${couponId}`, { method: 'DELETE' });
       if (res.ok) {
+        setShowModal(false);
         router.refresh();
       } else {
-        const data = await res.json();
-        alert(data.error || 'Error al eliminar');
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || 'Error al eliminar');
       }
     } catch {
-      alert('Error de conexion');
+      setError('Error de conexion');
     } finally {
-      setLoading(false);
+      setDeleting(false);
     }
   };
 
   return (
-    <div style={{ display: 'flex', gap: 4 }}>
-      <button
-        className="admin-btn"
-        data-variant="ghost"
-        data-size="sm"
-        onClick={toggleActive}
-        disabled={loading}
-        title={active ? 'Desactivar' : 'Activar'}
-      >
-        <CheckIcon size={14} />
-      </button>
-      <button
-        className="admin-btn"
-        data-variant="ghost"
-        data-size="sm"
-        onClick={handleDelete}
-        disabled={loading}
-      >
-        <TrashIcon size={14} />
-      </button>
-    </div>
+    <>
+      <div style={{ display: 'flex', gap: 4 }}>
+        <button
+          className="admin-btn"
+          data-variant="ghost"
+          data-size="sm"
+          onClick={toggleActive}
+          disabled={loading}
+          title={active ? 'Desactivar' : 'Activar'}
+        >
+          <CheckIcon size={14} />
+        </button>
+        <button
+          className="admin-btn"
+          data-variant="ghost"
+          data-size="sm"
+          onClick={() => {
+            setError(null);
+            setShowModal(true);
+          }}
+          disabled={loading}
+        >
+          <TrashIcon size={14} />
+        </button>
+      </div>
+      <ConfirmDeleteModal
+        open={showModal}
+        title="Eliminar cupon"
+        description={
+          <>
+            ¿Seguro que quieres eliminar el cupon <strong>{couponCode}</strong>? Esta accion no se puede deshacer.
+          </>
+        }
+        loading={deleting}
+        error={error}
+        onConfirm={handleDelete}
+        onCancel={() => setShowModal(false)}
+      />
+    </>
   );
 }

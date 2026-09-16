@@ -110,3 +110,36 @@ export async function PATCH(request: NextRequest) {
 
   return NextResponse.json({ ok: true });
 }
+
+export async function DELETE(request: NextRequest) {
+  const { serviceClient } = await requireAdmin();
+  const url = new URL(request.url);
+  const id = url.searchParams.get('id');
+
+  if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+
+  const { data: order, error: orderError } = await serviceClient
+    .from('orders')
+    .select('status')
+    .eq('id', id)
+    .single();
+
+  if (orderError || !order) {
+    return NextResponse.json({ error: 'No se encontro el pedido' }, { status: 404 });
+  }
+
+  if (STOCK_COMMITTED_STATUSES.includes(order.status)) {
+    const { error: stockError } = await serviceClient.rpc(
+      'apply_order_stock_change' as never,
+      { p_order_id: id, p_direction: 'restore' } as never,
+    );
+    if (stockError) return NextResponse.json({ error: stockError.message }, { status: 400 });
+  }
+
+  const { data, error } = await serviceClient.from('orders').delete().eq('id', id).select('id');
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (!data?.length) {
+    return NextResponse.json({ error: 'No se encontro el pedido' }, { status: 404 });
+  }
+  return NextResponse.json({ ok: true });
+}

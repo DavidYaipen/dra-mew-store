@@ -1,12 +1,11 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { EditIcon, TrashIcon } from '@/components/admin/AdminIcons';
+import { TrashIcon } from '@/components/admin/AdminIcons';
 import { ConfirmDeleteModal } from '@/components/admin/ConfirmDeleteModal';
 
-export function AdminProductActions({ productId, productName }: { productId: number; productName: string }) {
+export function AdminCustomerActions({ customerId, customerName }: { customerId: string; customerName: string }) {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -16,7 +15,7 @@ export function AdminProductActions({ productId, productName }: { productId: num
     setDeleting(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/products?id=${productId}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin/customers?id=${customerId}`, { method: 'DELETE' });
       if (res.ok) {
         setShowModal(false);
         router.refresh();
@@ -33,33 +32,23 @@ export function AdminProductActions({ productId, productName }: { productId: num
 
   return (
     <>
-      <div style={{ display: 'flex', gap: 4 }}>
-        <Link
-          href={`/admin/productos/${productId}/editar`}
-          className="admin-btn"
-          data-variant="ghost"
-          data-size="sm"
-        >
-          <EditIcon size={14} />
-        </Link>
-        <button
-          className="admin-btn"
-          data-variant="ghost"
-          data-size="sm"
-          onClick={() => {
-            setError(null);
-            setShowModal(true);
-          }}
-        >
-          <TrashIcon size={14} />
-        </button>
-      </div>
+      <button
+        className="admin-btn"
+        data-variant="ghost"
+        data-size="sm"
+        onClick={() => {
+          setError(null);
+          setShowModal(true);
+        }}
+      >
+        <TrashIcon size={14} />
+      </button>
       <ConfirmDeleteModal
         open={showModal}
-        title="Eliminar producto"
+        title="Eliminar cliente"
         description={
           <>
-            ¿Seguro que quieres eliminar <strong>{productName}</strong>? Esta accion no se puede deshacer.
+            ¿Seguro que quieres eliminar a <strong>{customerName}</strong>? Esta accion no se puede deshacer.
           </>
         }
         loading={deleting}

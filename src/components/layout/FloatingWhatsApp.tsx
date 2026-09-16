@@ -1,9 +1,21 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { WHATSAPP_PHONE, WHATSAPP_MESSAGE } from '@/lib/constants';
 import styles from './FloatingWhatsApp.module.css';
 
 export function FloatingWhatsApp() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    function onScroll() {
+      setVisible(window.scrollY > 150);
+    }
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   const href = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 
   return (
@@ -12,6 +24,7 @@ export function FloatingWhatsApp() {
       target="_blank"
       rel="noopener noreferrer"
       className={styles.whatsapp}
+      data-visible={visible}
       aria-label="Contactar por WhatsApp"
     >
       <svg viewBox="0 0 24 24" width={28} height={28} fill="#fff" aria-hidden>

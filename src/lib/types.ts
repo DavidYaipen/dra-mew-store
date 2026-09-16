@@ -32,6 +32,10 @@ export interface Product {
   material?: string;
   /** Origen: official (Pokemon Center) o generic. */
   origin?: 'official' | 'generic';
+  /** Disponible en preventa: se puede comprar aunque no haya stock real todavía. */
+  is_preorder?: boolean;
+  /** Nota de preventa (ej. "Llega en octubre"). */
+  preorder_note?: string;
 }
 
 export interface ProductVariant {
@@ -45,9 +49,40 @@ export interface ProductVariant {
 }
 
 export interface CartLine {
-  id: number;
+  /** Id de producto (number) o de binder listing (UUID string). */
+  id: number | string;
   qty: number;
   variant_id?: string;
+  /** 'product' es el default (carritos guardados antes de esta feature no tienen kind). */
+  kind?: 'product' | 'binder';
+}
+
+// ─── Binder virtual (cartas sueltas) ────────────────────────────
+
+export type CardFinish = 'comun' | 'holo' | 'reverse';
+export type CardCondition = 'NM' | 'LP' | 'MP' | 'HP' | 'Damaged';
+
+export interface BinderCard {
+  id: string;
+  name: string;
+  collection: string;
+  cardNumber?: string;
+  image?: string;
+}
+
+/** Un listing es una combinación vendible (acabado + condición) de una BinderCard. */
+export interface BinderListing {
+  id: string;
+  cardId: string;
+  name: string;
+  collection: string;
+  cardNumber?: string;
+  image?: string;
+  finish: CardFinish;
+  condition: CardCondition;
+  price: number;
+  stock: number;
+  isPreorder: boolean;
 }
 
 export interface FaqItem {
@@ -76,12 +111,14 @@ export type OrderStatus =
 export interface OrderItem {
   id: string;
   order_id: string;
-  product_id: number;
+  product_id?: number;
   variant_id?: string;
+  binder_listing_id?: string;
   name: string;
   price: number;
   quantity: number;
   image?: string;
+  is_preorder?: boolean;
 }
 
 export interface Order {

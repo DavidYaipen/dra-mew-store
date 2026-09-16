@@ -9,7 +9,14 @@ import { ProductImage } from '@/components/ui/ProductImage';
 import { HeartIcon } from '@/components/ui/Icons';
 import styles from './ProductDetail.module.css';
 
-function stockStatus(stock: number | undefined): { label: string; level: 'ok' | 'low' | 'out' } {
+function stockStatus(product: Product): { label: string; level: 'ok' | 'low' | 'out' | 'preorder' } {
+  if (product.is_preorder) {
+    return {
+      label: product.preorder_note ? `Preventa · ${product.preorder_note}` : 'Preventa',
+      level: 'preorder',
+    };
+  }
+  const stock = product.stock;
   if (stock === undefined) return { label: 'En stock · listo para enviar', level: 'ok' };
   if (stock === 0) return { label: 'Agotado', level: 'out' };
   if (stock <= 5) return { label: `¡Últimas ${stock} unidades!`, level: 'low' };
@@ -22,7 +29,7 @@ export function ProductDetail({ product }: { product: Product }) {
   const wished = isWished(product.id);
   const discount = discountLabel(product.price, product.oldPrice);
   const onSale = product.oldPrice != null;
-  const stock = stockStatus(product.stock);
+  const stock = stockStatus(product);
 
   return (
     <div className={styles.layout}>

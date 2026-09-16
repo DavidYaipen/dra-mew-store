@@ -86,7 +86,24 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
                 <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   {item.image && <ProductImage src={item.image} alt={item.name} size={48} />}
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, fontSize: 14 }}>{item.name}</div>
+                    <div style={{ fontWeight: 600, fontSize: 14 }}>
+                      {item.name}
+                      {item.is_preorder && (
+                        <span
+                          style={{
+                            marginLeft: 8,
+                            padding: '2px 8px',
+                            borderRadius: 999,
+                            fontSize: 10,
+                            fontWeight: 700,
+                            background: '#ede9fe',
+                            color: '#6d28d9',
+                          }}
+                        >
+                          Preventa
+                        </span>
+                      )}
+                    </div>
                     <div style={{ fontSize: 13, color: 'var(--text-faint)' }}>
                       {formatPrice(item.price)} x {item.quantity}
                     </div>

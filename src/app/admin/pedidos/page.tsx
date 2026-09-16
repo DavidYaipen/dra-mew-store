@@ -11,6 +11,7 @@ interface OrderWithCustomer {
   payment_status: string;
   created_at: string;
   customers: { name: string; email: string } | null;
+  order_items: { is_preorder: boolean }[] | null;
 }
 
 export default async function AdminOrdersPage() {
@@ -18,7 +19,7 @@ export default async function AdminOrdersPage() {
 
   const { data: orders } = await serviceClient
     .from('orders')
-    .select('*, customers(name, email)')
+    .select('*, customers(name, email), order_items(is_preorder)')
     .order('created_at', { ascending: false });
 
   const typed = (orders || []) as OrderWithCustomer[];
@@ -51,7 +52,24 @@ export default async function AdminOrdersPage() {
             <tbody>
               {typed.map((order) => (
                 <tr key={order.id}>
-                  <td className="mono">#{order.id.slice(0, 8)}</td>
+                  <td className="mono">
+                    #{order.id.slice(0, 8)}
+                    {order.order_items?.some((i) => i.is_preorder) && (
+                      <span
+                        style={{
+                          marginLeft: 8,
+                          padding: '2px 8px',
+                          borderRadius: 999,
+                          fontSize: 10,
+                          fontWeight: 700,
+                          background: '#ede9fe',
+                          color: '#6d28d9',
+                        }}
+                      >
+                        Preventa
+                      </span>
+                    )}
+                  </td>
                   <td>
                     <div style={{ fontSize: 14 }}>
                       <div style={{ fontWeight: 500 }}>{order.customers?.name || 'Sin nombre'}</div>

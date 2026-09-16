@@ -18,6 +18,8 @@ export function ProductForm({ initialData }: { initialData?: Record<string, unkn
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [imagePreview, setImagePreview] = useState<string>((initialData?.image as string) || '');
+  const [tint, setTint] = useState<string>((initialData?.tint as string) || '');
+  const [isPreorder, setIsPreorder] = useState<boolean>(!!initialData?.is_preorder);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -73,16 +75,19 @@ export function ProductForm({ initialData }: { initialData?: Record<string, unkn
 
     const form = new FormData(e.currentTarget);
     const body = {
-      id: initialData?.id ? Number(initialData.id) : Number(form.get('id')),
+      ...(initialData?.id ? { id: Number(initialData.id) } : {}),
       name: form.get('name'),
       cat: form.get('cat'),
       price: Number(form.get('price')),
       old_price: form.get('old_price') ? Number(form.get('old_price')) : null,
       rating: Number(form.get('rating')),
       image: imagePreview || form.get('image'),
-      tint: form.get('tint'),
+      tint,
       badge: form.get('badge') || null,
       is_featured: form.get('is_featured') === 'on',
+      stock: form.get('stock') !== '' ? Number(form.get('stock')) : null,
+      is_preorder: form.get('is_preorder') === 'on',
+      preorder_note: form.get('preorder_note') || null,
     };
 
     try {
@@ -111,17 +116,12 @@ export function ProductForm({ initialData }: { initialData?: Record<string, unkn
   return (
     <form className="admin-form" onSubmit={handleSubmit}>
       <div className="form-row">
-        <div className="form-group">
-          <label htmlFor="id">ID del producto</label>
-          <input
-            id="id"
-            name="id"
-            type="number"
-            defaultValue={(initialData?.id as number) || ''}
-            disabled={!!initialData?.id}
-            required
-          />
-        </div>
+        {initialData?.id != null && (
+          <div className="form-group">
+            <label htmlFor="id">ID del producto</label>
+            <input id="id" type="number" value={initialData.id as number} disabled readOnly />
+          </div>
+        )}
         <div className="form-group">
           <label htmlFor="name">Nombre</label>
           <input id="name" name="name" type="text" defaultValue={initialData?.name as string} required />
@@ -140,8 +140,11 @@ export function ProductForm({ initialData }: { initialData?: Record<string, unkn
         </div>
         <div className="form-group">
           <label htmlFor="tint">Color de tarjeta</label>
-          <select id="tint" name="tint" defaultValue={initialData?.tint as string} required>
+          <select id="tint" name="tint" value={tint} onChange={(e) => setTint(e.target.value)} required>
             <option value="">Seleccionar...</option>
+            {tint && !Object.values(TINTS).includes(tint) && (
+              <option value={tint}>Personalizado (actual)</option>
+            )}
             {Object.entries(TINTS).map(([name, value]) => (
               <option key={name} value={value}>{name}</option>
             ))}
@@ -175,6 +178,46 @@ export function ProductForm({ initialData }: { initialData?: Record<string, unkn
             <option value="Coleccionista">Coleccionista</option>
           </select>
         </div>
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="stock">Stock - opcional (solo para productos sin variantes)</label>
+        <input
+          id="stock"
+          name="stock"
+          type="number"
+          step="1"
+          min="0"
+          defaultValue={initialData?.stock != null ? (initialData.stock as number) : ''}
+          placeholder="Vacío = sin control de stock"
+        />
+        <div style={{ fontSize: 12, color: 'var(--text-faint)', marginTop: 4 }}>
+          Si el producto tiene variantes, el stock se gestiona por variante más abajo en{' '}
+          /admin/productos. Cambiar este valor queda registrado como un ajuste en el
+          cárdex de inventario.
+        </div>
+      </div>
+
+      <div className="form-group">
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+          <input
+            type="checkbox"
+            name="is_preorder"
+            checked={isPreorder}
+            onChange={(e) => setIsPreorder(e.target.checked)}
+            style={{ width: 18, height: 18 }}
+          />
+          Disponible en preventa (se puede comprar aunque no haya stock todavía)
+        </label>
+        {isPreorder && (
+          <input
+            name="preorder_note"
+            type="text"
+            defaultValue={(initialData?.preorder_note as string) || ''}
+            placeholder="Nota de preventa, ej: Llega en octubre"
+            style={{ marginTop: 8 }}
+          />
+        )}
       </div>
 
       {/* Image Upload Section */}

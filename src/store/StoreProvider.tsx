@@ -9,7 +9,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import type { CartLine, Product } from '@/lib/types';
+import type { BinderListing, CartLine, Product } from '@/lib/types';
 import {
   addLine,
   cartCount as countUnits,
@@ -32,10 +32,12 @@ export interface StoreContextValue {
   wishCount: number;
   subtotal: number;
   productMap: Map<number, Product>;
+  binderMap: Map<string, BinderListing>;
   getProduct: (id: number) => Product | undefined;
-  addToCart: (id: number, qty?: number) => void;
-  changeQty: (id: number, delta: number) => void;
-  removeFromCart: (id: number) => void;
+  getBinderListing: (id: string) => BinderListing | undefined;
+  addToCart: (id: CartLine['id'], qty?: number, kind?: NonNullable<CartLine['kind']>) => void;
+  changeQty: (id: CartLine['id'], delta: number, kind?: NonNullable<CartLine['kind']>) => void;
+  removeFromCart: (id: CartLine['id'], kind?: NonNullable<CartLine['kind']>) => void;
   toggleWishlist: (id: number) => void;
   isWished: (id: number) => boolean;
   showToast: (message: string, cta?: boolean) => void;
@@ -63,6 +65,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [toast, setToast] = useState<ToastState | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [productMap, setProductMap] = useState<Map<number, Product>>(new Map());
+  const [binderMap, setBinderMap] = useState<Map<string, BinderListing>>(new Map());
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // Hidratar desde localStorage tras el montaje (evita desajustes SSR).
@@ -78,6 +81,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       .then((r) => r.json())
       .then((data: Product[]) => {
         setProductMap(new Map(data.map((p) => [p.id, p])));
+      })
+      .catch(() => {
+        // Silenciar errores de red; el Map queda vacío y la UI muestra fallback.
+      });
+  }, []);
+
+  // Fetch catálogo del binder (cartas sueltas) para resolver líneas kind: 'binder'.
+  useEffect(() => {
+    fetch('/api/binder-catalog')
+      .then((r) => r.json())
+      .then((data: BinderListing[]) => {
+        setBinderMap(new Map(data.map((l) => [l.id, l])));
       })
       .catch(() => {
         // Silenciar errores de red; el Map queda vacío y la UI muestra fallback.
@@ -106,20 +121,26 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const addToCart = useCallback(
-    (id: number, qty = 1) => {
-      setCart((c) => addLine(c, id, qty));
+    (id: CartLine['id'], qty = 1, kind: NonNullable<CartLine['kind']> = 'product') => {
+      setCart((c) => addLine(c, id, qty, kind));
       showToast('Añadido al carrito', true);
     },
     [showToast],
   );
 
-  const changeQty = useCallback((id: number, delta: number) => {
-    setCart((c) => changeQtyFn(c, id, delta));
-  }, []);
+  const changeQty = useCallback(
+    (id: CartLine['id'], delta: number, kind: NonNullable<CartLine['kind']> = 'product') => {
+      setCart((c) => changeQtyFn(c, id, delta, kind));
+    },
+    [],
+  );
 
-  const removeFromCart = useCallback((id: number) => {
-    setCart((c) => removeLine(c, id));
-  }, []);
+  const removeFromCart = useCallback(
+    (id: CartLine['id'], kind: NonNullable<CartLine['kind']> = 'product') => {
+      setCart((c) => removeLine(c, id, kind));
+    },
+    [],
+  );
 
   const toggleWishlist = useCallback(
     (id: number) => {
@@ -139,6 +160,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [productMap],
   );
 
+  const getBinderListingFn = useCallback(
+    (id: string) => binderMap.get(id),
+    [binderMap],
+  );
+
   const value = useMemo<StoreContextValue>(
     () => ({
       cart,
@@ -146,9 +172,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       toast,
       cartCount: countUnits(cart),
       wishCount: wishlist.length,
-      subtotal: subtotalFn(cart, productMap),
+      subtotal: subtotalFn(cart, productMap, binderMap),
       productMap,
+      binderMap,
       getProduct: getProductFn,
+      getBinderListing: getBinderListingFn,
       addToCart,
       changeQty,
       removeFromCart,
@@ -162,7 +190,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       wishlist,
       toast,
       productMap,
+      binderMap,
       getProductFn,
+      getBinderListingFn,
       addToCart,
       changeQty,
       removeFromCart,

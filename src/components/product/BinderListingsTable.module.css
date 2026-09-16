@@ -1,0 +1,71 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.table th {
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 14px;
+}
+
+.price {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.stock {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.stock[data-level='low'] {
+  color: #d97706;
+  font-weight: 600;
+}
+.stock[data-level='out'] {
+  color: #dc2626;
+  font-weight: 600;
+}
+.stock[data-level='preorder'] {
+  color: #7c3aed;
+  font-weight: 600;
+}
+
+.qtyInput {
+  width: 56px;
+  height: 34px;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  text-align: center;
+  font-family: var(--font-mono);
+}
+
+.addBtn {
+  height: 34px;
+  padding: 0 14px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--brand);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.addBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

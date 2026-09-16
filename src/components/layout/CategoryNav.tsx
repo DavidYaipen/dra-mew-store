@@ -30,6 +30,11 @@ const NAV_ITEMS: NavItem[] = [
     isActive: (p) => p === '/categoria/cartas',
   },
   {
+    label: 'Cartas sueltas',
+    href: '/binder',
+    isActive: (p) => p.startsWith('/binder'),
+  },
+  {
     label: 'Accesorios',
     href: '/categoria/accesorios',
     isActive: (p) => p === '/categoria/accesorios',

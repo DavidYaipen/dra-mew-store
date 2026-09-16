@@ -48,7 +48,7 @@ describe('StoreProvider', () => {
     act(() => result.current.addToCart(7, 1));
     await waitFor(() =>
       expect(JSON.parse(window.localStorage.getItem('dmw.cart') ?? '[]')).toEqual([
-        { id: 7, qty: 1 },
+        { id: 7, qty: 1, kind: 'product' },
       ]),
     );
   });

@@ -45,6 +45,26 @@ export default async function CategoryPage({ params }: Props) {
 
       <CategoryHero category={category} />
 
+      {category.name === 'Cartas' && (
+        <Link
+          href="/binder"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '10px 18px',
+            borderRadius: 999,
+            background: 'var(--violet-100)',
+            color: '#6d28d9',
+            fontWeight: 600,
+            fontSize: 14,
+            marginBottom: 20,
+          }}
+        >
+          ¿Buscas cartas sueltas? Visita el binder virtual →
+        </Link>
+      )}
+
       <div className={styles.products}>
         <ProductGrid products={products} />
       </div>

@@ -101,6 +101,11 @@
   font-weight: 600;
 }
 
+.stock[data-level='preorder'] {
+  color: #7c3aed;
+  font-weight: 600;
+}
+
 .prices {
   display: flex;
   align-items: baseline;
@@ -264,6 +269,10 @@
   .layout {
     grid-template-columns: 1fr;
     gap: 32px;
+  }
+  .stage {
+    max-width: 420px;
+    margin: 0 auto;
   }
   .title {
     font-size: 34px;

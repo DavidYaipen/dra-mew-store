@@ -20,7 +20,7 @@ interface OrderResult {
 }
 
 export default function CheckoutPage() {
-  const { cart, subtotal, getProduct, showToast } = useStore();
+  const { cart, subtotal, getProduct, getBinderListing, showToast } = useStore();
   const [step, setStep] = useState<'data' | 'shipping' | 'payment' | 'confirming'>('data');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<OrderResult | null>(null);
@@ -318,10 +318,23 @@ export default function CheckoutPage() {
         <div className={styles.summary}>
           <h3 className={styles.summaryTitle}>Tu pedido</h3>
           {cart.map((line) => {
-            const product = getProduct(line.id);
+            const key = `${line.kind ?? 'product'}-${line.id}`;
+            if (line.kind === 'binder') {
+              const listing = getBinderListing(String(line.id));
+              if (!listing) return null;
+              return (
+                <div key={key} className={styles.summaryItem}>
+                  <span className={styles.itemName}>
+                    {listing.name} × {line.qty}
+                  </span>
+                  <span>{formatPrice(listing.price * line.qty)}</span>
+                </div>
+              );
+            }
+            const product = getProduct(line.id as number);
             if (!product) return null;
             return (
-              <div key={line.id} className={styles.summaryItem}>
+              <div key={key} className={styles.summaryItem}>
                 <span className={styles.itemName}>
                   {product.name} × {line.qty}
                 </span>

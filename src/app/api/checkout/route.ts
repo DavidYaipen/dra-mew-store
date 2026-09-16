@@ -36,20 +36,72 @@ export async function POST(request: NextRequest) {
       couponId = coupon.id;
     }
 
-    // 2. Fetch productos del carrito para calcular precios reales
-    const productIds = payload.cart.map((line) => line.id);
-    const { data: products } = await supabase
-      .from('products')
-      .select('id, name, price, image')
-      .in('id', productIds);
+    // 2. Fetch productos y binder listings del carrito para calcular precios reales
+    const productLines = payload.cart.filter((line) => (line.kind ?? 'product') === 'product');
+    const binderLines = payload.cart.filter((line) => line.kind === 'binder');
+
+    const productIds = productLines.map((line) => line.id);
+    const { data: products } = productIds.length
+      ? await supabase
+          .from('products')
+          .select('id, name, price, image, stock, is_preorder')
+          .in('id', productIds)
+      : { data: [] as Array<{ id: number; name: string; price: number; image: string; stock: number | null; is_preorder: boolean }> };
 
     if (!products) {
       return NextResponse.json({ error: 'Error al consultar productos' }, { status: 500 });
     }
 
+    interface BinderListingRow {
+      id: string;
+      price: number;
+      stock: number;
+      is_preorder: boolean;
+      finish: string;
+      condition: string;
+      binder_cards: { name: string; image: string | null } | null;
+    }
+
+    const binderIds = binderLines.map((line) => line.id);
+    const binderListingsResult = binderIds.length
+      ? await supabase
+          .from('binder_listings')
+          .select('id, price, stock, is_preorder, finish, condition, binder_cards(name, image)')
+          .in('id', binderIds)
+      : { data: [] as BinderListingRow[], error: null };
+
+    if (binderListingsResult.error || !binderListingsResult.data) {
+      return NextResponse.json({ error: 'Error al consultar el binder' }, { status: 500 });
+    }
+    const binderListings = binderListingsResult.data as unknown as BinderListingRow[];
+
+    // 2b. Validar disponibilidad (chequeo optimista; el descuento real y la
+    // validación atómica final ocurren recién al confirmar el pedido).
+    // Los items en preventa se saltan esta validación: se pueden vender
+    // aunque no haya stock real todavía.
+    for (const line of productLines) {
+      const product = products.find((p) => p.id === line.id);
+      if (!product?.is_preorder && product?.stock != null && product.stock < line.qty) {
+        return NextResponse.json(
+          { error: `Solo quedan ${product.stock} unidades de ${product.name} disponibles.` },
+          { status: 400 },
+        );
+      }
+    }
+    for (const line of binderLines) {
+      const listing = binderListings.find((l) => l.id === line.id);
+      const listingName = listing?.binder_cards?.name ?? 'la carta';
+      if (listing && !listing.is_preorder && listing.stock < line.qty) {
+        return NextResponse.json(
+          { error: `Solo quedan ${listing.stock} unidades de ${listingName} disponibles.` },
+          { status: 400 },
+        );
+      }
+    }
+
     // 3. Calcular subtotal
     let subtotal = 0;
-    const items = payload.cart.map((line) => {
+    const productItems = productLines.map((line) => {
       const product = products.find((p) => p.id === line.id);
       if (!product) throw new Error(`Producto ${line.id} no encontrado`);
       const itemTotal = product.price * line.qty;
@@ -60,8 +112,28 @@ export async function POST(request: NextRequest) {
         price: product.price,
         quantity: line.qty,
         image: product.image,
+        is_preorder: product.is_preorder,
+        url: `${STORE_URL}/producto/${product.id}`,
       };
     });
+    const binderItems = binderLines.map((line) => {
+      const listing = binderListings.find((l) => l.id === line.id);
+      if (!listing) throw new Error(`Carta ${line.id} no encontrada`);
+      const itemTotal = listing.price * line.qty;
+      subtotal += itemTotal;
+      const finishLabels: Record<string, string> = { comun: 'Común', holo: 'Holo', reverse: 'Reverse' };
+      const finishLabel = finishLabels[listing.finish] ?? listing.finish;
+      return {
+        binder_listing_id: listing.id,
+        name: `${listing.binder_cards?.name ?? 'Carta'} · ${finishLabel} · ${listing.condition}`,
+        price: listing.price,
+        quantity: line.qty,
+        image: listing.binder_cards?.image ?? undefined,
+        is_preorder: listing.is_preorder,
+        url: `${STORE_URL}/binder`,
+      };
+    });
+    const items = [...productItems, ...binderItems];
 
     // 4. Recalcular descuento con subtotal real
     if (payload.coupon_code && couponId) {
@@ -125,7 +197,13 @@ export async function POST(request: NextRequest) {
     // 8. Crear order items
     const orderItems = items.map((item) => ({
       order_id: order.id,
-      ...item,
+      product_id: 'product_id' in item ? item.product_id : undefined,
+      binder_listing_id: 'binder_listing_id' in item ? item.binder_listing_id : undefined,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      image: item.image,
+      is_preorder: item.is_preorder,
     }));
 
     const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
@@ -196,7 +274,7 @@ function generateWhatsAppMessage({
   customerEmail: string;
   shippingMethod: string;
   address: string;
-  items: Array<{ name: string; price: number; quantity: number; product_id: number }>;
+  items: Array<{ name: string; price: number; quantity: number; url: string }>;
   subtotal: number;
   shippingCost: number;
   total: number;
@@ -204,8 +282,7 @@ function generateWhatsAppMessage({
   const productLines = items
     .map((item) => {
       const itemTotal = (item.price * item.quantity).toFixed(2);
-      const productUrl = `${STORE_URL}/producto/${item.product_id}`;
-      return `• ${item.name} - ${item.quantity} un. - S/ ${itemTotal} - ${productUrl}`;
+      return `• ${item.name} - ${item.quantity} un. - S/ ${itemTotal} - ${item.url}`;
     })
     .join('\n');
 

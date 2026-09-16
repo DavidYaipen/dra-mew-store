@@ -1,6 +1,22 @@
 import { cache } from 'react';
 import { createServiceClient } from '@/lib/supabase/service';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Product, Category } from '@/lib/types';
+
+async function stockByProductFromVariants(
+  supabase: SupabaseClient,
+): Promise<Map<number, number>> {
+  const { data: variants, error } = await supabase
+    .from('product_variants')
+    .select('product_id, stock');
+  if (error) throw new Error(`Failed to fetch variants: ${error.message}`);
+
+  const stockByProduct = new Map<number, number>();
+  for (const v of variants as { product_id: number; stock: number }[]) {
+    stockByProduct.set(v.product_id, (stockByProduct.get(v.product_id) ?? 0) + v.stock);
+  }
+  return stockByProduct;
+}
 
 interface ProductRow {
   id: number;
@@ -17,6 +33,9 @@ interface ProductRow {
   dimensions: string | null;
   material: string | null;
   origin: string | null;
+  stock: number | null;
+  is_preorder: boolean;
+  preorder_note: string | null;
 }
 
 function rowToProduct(row: ProductRow, stock?: number): Product {
@@ -35,6 +54,8 @@ function rowToProduct(row: ProductRow, stock?: number): Product {
     dimensions: row.dimensions ?? undefined,
     material: row.material ?? undefined,
     origin: (row.origin as 'official' | 'generic') ?? undefined,
+    is_preorder: row.is_preorder,
+    preorder_note: row.preorder_note ?? undefined,
   };
 }
 
@@ -46,17 +67,11 @@ export const getCatalog = cache(async (): Promise<Product[]> => {
     .order('id');
   if (error) throw new Error(`Failed to fetch catalog: ${error.message}`);
 
-  const { data: variants, error: variantsError } = await supabase
-    .from('product_variants')
-    .select('product_id, stock');
-  if (variantsError) throw new Error(`Failed to fetch variants: ${variantsError.message}`);
+  const stockByProduct = await stockByProductFromVariants(supabase);
 
-  const stockByProduct = new Map<number, number>();
-  for (const v of variants as { product_id: number; stock: number }[]) {
-    stockByProduct.set(v.product_id, (stockByProduct.get(v.product_id) ?? 0) + v.stock);
-  }
-
-  return (data as ProductRow[]).map((row) => rowToProduct(row, stockByProduct.get(row.id)));
+  return (data as ProductRow[]).map((row) =>
+    rowToProduct(row, stockByProduct.get(row.id) ?? row.stock ?? undefined),
+  );
 });
 
 export async function getProductFromDB(id: number): Promise<Product | undefined> {
@@ -86,7 +101,12 @@ export const getFeaturedProducts = cache(async (): Promise<Product[]> => {
     .eq('is_featured', true)
     .order('id');
   if (error) throw new Error(`Failed to fetch featured: ${error.message}`);
-  return (data as ProductRow[]).map(rowToProduct);
+
+  const stockByProduct = await stockByProductFromVariants(supabase);
+
+  return (data as ProductRow[]).map((row) =>
+    rowToProduct(row, stockByProduct.get(row.id) ?? row.stock ?? undefined),
+  );
 });
 
 export interface ApprovedReview {

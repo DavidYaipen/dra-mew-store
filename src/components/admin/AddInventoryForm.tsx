@@ -7,6 +7,7 @@ import { PlusIcon } from '@/components/admin/AdminIcons';
 interface Product {
   id: number;
   name: string;
+  stock: number | null;
 }
 
 interface Variant {
@@ -23,6 +24,7 @@ export function AddInventoryForm({ products, variants }: { products: Product[]; 
   const [productId, setProductId] = useState('');
 
   const productVariants = variants.filter((v) => String(v.product_id) === productId);
+  const selectedProduct = products.find((p) => String(p.id) === productId);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -104,9 +106,15 @@ export function AddInventoryForm({ products, variants }: { products: Product[]; 
                       ))}
                     </select>
                   </div>
-                ) : (
+                ) : selectedProduct?.stock != null ? (
                   <div style={{ fontSize: 13, color: 'var(--text-faint)' }}>
-                    Este producto no tiene variantes; el movimiento se registrará sin actualizar stock.
+                    Este producto no tiene variantes; el movimiento se aplicará sobre su stock
+                    directo (actualmente {selectedProduct.stock}).
+                  </div>
+                ) : (
+                  <div style={{ fontSize: 13, color: '#dc2626' }}>
+                    Este producto no tiene stock rastreado todavía. Asígnale un valor inicial
+                    desde /admin/productos antes de registrar movimientos.
                   </div>
                 )
               )}

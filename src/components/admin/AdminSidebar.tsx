@@ -9,17 +9,17 @@ import {
   TagIcon,
   UsersIcon,
   StarIcon,
-  BoxIcon,
+  CardsIcon,
 } from '@/components/admin/AdminIcons';
 
 const NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard', icon: DashboardIcon },
   { href: '/admin/productos', label: 'Productos', icon: PackageIcon },
+  { href: '/admin/binder', label: 'Binder', icon: CardsIcon },
   { href: '/admin/pedidos', label: 'Pedidos', icon: ShoppingCartIcon },
   { href: '/admin/cupones', label: 'Cupones', icon: TagIcon },
   { href: '/admin/clientes', label: 'Clientes', icon: UsersIcon },
   { href: '/admin/resenas', label: 'Resenas', icon: StarIcon },
-  { href: '/admin/inventario', label: 'Inventario', icon: BoxIcon },
 ];
 
 export function AdminSidebar({ email }: { email?: string }) {

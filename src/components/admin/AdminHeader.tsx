@@ -7,11 +7,11 @@ import { ArrowLeftIcon } from '@/components/admin/AdminIcons';
 const PAGE_TITLES: Record<string, string> = {
   '/admin': 'Dashboard',
   '/admin/productos': 'Productos',
+  '/admin/binder': 'Binder',
   '/admin/pedidos': 'Pedidos',
   '/admin/cupones': 'Cupones',
   '/admin/clientes': 'Clientes',
   '/admin/resenas': 'Resenas',
-  '/admin/inventario': 'Inventario',
 };
 
 export function AdminHeader() {

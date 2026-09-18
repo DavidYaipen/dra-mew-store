@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { signup } from '@/lib/supabase/auth';
+import { EyeIcon, EyeOffIcon } from '@/components/ui/Icons';
 import styles from './page.module.css';
 
 export default function RegisterPage({
@@ -14,6 +15,7 @@ export default function RegisterPage({
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [registeredEmail, setRegisteredEmail] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     searchParams.then((p) => {
@@ -44,7 +46,24 @@ export default function RegisterPage({
           </div>
           <div className={styles.field}>
             <label htmlFor="password">Contraseña</label>
-            <input id="password" name="password" type="password" required placeholder="Mínimo 6 caracteres" minLength={6} />
+            <div className={styles.passwordWrap}>
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                required
+                placeholder="Mínimo 6 caracteres"
+                minLength={6}
+              />
+              <button
+                type="button"
+                className={styles.togglePassword}
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+              </button>
+            </div>
           </div>
 
           {error && <div className={styles.error}>{error}</div>}

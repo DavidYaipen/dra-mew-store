@@ -57,6 +57,34 @@
   border-color: var(--pink);
 }
 
+.passwordWrap {
+  position: relative;
+}
+
+.passwordWrap input {
+  padding-right: 42px;
+}
+
+.togglePassword {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--graphite-500);
+  cursor: pointer;
+  padding: 0;
+}
+
+.togglePassword:hover {
+  color: var(--graphite-700);
+}
+
 .btn {
   width: 100%;
   padding: 12px;

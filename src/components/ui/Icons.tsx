@@ -34,6 +34,25 @@ export function UserIcon(props: IconProps) {
   );
 }
 
+export function EyeIcon(props: IconProps) {
+  return (
+    <svg {...base(props)} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+export function EyeOffIcon(props: IconProps) {
+  return (
+    <svg {...base(props)} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 3l18 18" />
+      <path d="M10.58 10.58a2 2 0 0 0 2.83 2.83" />
+      <path d="M9.36 5.36A10.5 10.5 0 0 1 12 5c6.5 0 10 7 10 7a13.5 13.5 0 0 1-3.06 3.94M6.6 6.6C3.9 8.3 2 12 2 12s3.5 7 10 7a10.4 10.4 0 0 0 3.4-.58" />
+    </svg>
+  );
+}
+
 export function HeartIcon({ filled = false, ...props }: IconProps & { filled?: boolean }) {
   return (
     <svg

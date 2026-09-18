@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -30,7 +31,9 @@ export function AdminSidebar({ email }: { email?: string }) {
   return (
     <aside className="admin-sidebar">
       <div className="sidebar-logo">
-        <h2>Dra. Mew</h2>
+        <div className="sidebar-logo-chip">
+          <Image src="/logo/logo.png" alt="Dra. Mew Store" fill className="sidebar-logo-img" />
+        </div>
         <span>Admin Panel</span>
       </div>
 

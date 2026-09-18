@@ -4,10 +4,19 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { TrashIcon } from '@/components/admin/AdminIcons';
 import { ConfirmDeleteModal } from '@/components/admin/ConfirmDeleteModal';
+import { PAYMENT_STATUSES, orderStatusLabel, paymentStatusLabel } from '@/lib/orderStatus';
 
 const STATUSES = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
 
-export function AdminOrderActions({ orderId, currentStatus }: { orderId: string; currentStatus: string }) {
+export function AdminOrderActions({
+  orderId,
+  currentStatus,
+  currentPaymentStatus,
+}: {
+  orderId: string;
+  currentStatus: string;
+  currentPaymentStatus: string;
+}) {
   const router = useRouter();
   const [updating, setUpdating] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -28,6 +37,28 @@ export function AdminOrderActions({ orderId, currentStatus }: { orderId: string;
       } else {
         const data = await res.json();
         alert(data.error || 'Error al actualizar el estado');
+      }
+    } catch {
+      alert('Error de conexion');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handlePaymentStatusChange = async (newPaymentStatus: string) => {
+    if (newPaymentStatus === currentPaymentStatus) return;
+    setUpdating(true);
+    try {
+      const res = await fetch('/api/admin/orders', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: orderId, payment_status: newPaymentStatus }),
+      });
+      if (res.ok) {
+        router.refresh();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Error al actualizar el pago');
       }
     } catch {
       alert('Error de conexion');
@@ -74,7 +105,26 @@ export function AdminOrderActions({ orderId, currentStatus }: { orderId: string;
           }}
         >
           {STATUSES.map((s) => (
-            <option key={s} value={s}>{s}</option>
+            <option key={s} value={s}>{orderStatusLabel(s)}</option>
+          ))}
+        </select>
+        <select
+          value={currentPaymentStatus}
+          onChange={(e) => handlePaymentStatusChange(e.target.value)}
+          disabled={updating}
+          style={{
+            padding: '4px 8px',
+            borderRadius: 8,
+            border: '1px solid var(--border-soft)',
+            fontSize: 12,
+            fontWeight: 600,
+            fontFamily: 'var(--font-sans)',
+            background: '#fff',
+            cursor: 'pointer',
+          }}
+        >
+          {PAYMENT_STATUSES.map((s) => (
+            <option key={s} value={s}>{paymentStatusLabel(s)}</option>
           ))}
         </select>
         <button

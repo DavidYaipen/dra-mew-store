@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/supabase/admin';
+import { PAYMENT_STATUSES } from '@/lib/orderStatus';
 
-const STOCK_COMMITTED_STATUSES = ['confirmed', 'processing', 'shipped', 'delivered'];
-const STOCK_UNCOMMITTED_STATUSES = ['pending', 'cancelled', 'refunded'];
+// El stock se descuenta al crear el pedido (en /api/checkout), no al
+// confirmarlo, así que 'pending' ya cuenta como estado que retiene stock.
+// Solo cancelado/reembolsado libera el stock reservado.
+const RESTORE_STATUSES = ['cancelled', 'refunded'];
 
 export async function GET() {
   const { serviceClient } = await requireAdmin();
@@ -18,8 +21,19 @@ export async function PATCH(request: NextRequest) {
   const { serviceClient } = await requireAdmin();
   const body = await request.json();
 
-  if (!body.status && !body.customer && !body.shipping_address) {
+  if (!body.status && !body.customer && !body.shipping_address && !body.payment_status) {
     return NextResponse.json({ error: 'Nada para actualizar' }, { status: 400 });
+  }
+
+  if (body.payment_status) {
+    if (!PAYMENT_STATUSES.includes(body.payment_status)) {
+      return NextResponse.json({ error: 'payment_status inválido' }, { status: 400 });
+    }
+    const { error } = await serviceClient
+      .from('orders')
+      .update({ payment_status: body.payment_status, updated_at: new Date().toISOString() })
+      .eq('id', body.id);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
   if (body.status) {
@@ -34,19 +48,12 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (body.status !== current.status) {
-      if (STOCK_COMMITTED_STATUSES.includes(body.status)) {
-        const { error: stockError } = await serviceClient.rpc(
-          'apply_order_stock_change' as never,
-          { p_order_id: body.id, p_direction: 'decrement' } as never,
-        );
-        if (stockError) return NextResponse.json({ error: stockError.message }, { status: 400 });
-      } else if (STOCK_UNCOMMITTED_STATUSES.includes(body.status)) {
-        const { error: stockError } = await serviceClient.rpc(
-          'apply_order_stock_change' as never,
-          { p_order_id: body.id, p_direction: 'restore' } as never,
-        );
-        if (stockError) return NextResponse.json({ error: stockError.message }, { status: 400 });
-      }
+      const direction = RESTORE_STATUSES.includes(body.status) ? 'restore' : 'decrement';
+      const { error: stockError } = await serviceClient.rpc(
+        'apply_order_stock_change' as never,
+        { p_order_id: body.id, p_direction: direction } as never,
+      );
+      if (stockError) return NextResponse.json({ error: stockError.message }, { status: 400 });
     }
 
     const { data, error } = await serviceClient
@@ -120,7 +127,7 @@ export async function DELETE(request: NextRequest) {
 
   const { data: order, error: orderError } = await serviceClient
     .from('orders')
-    .select('status')
+    .select('stock_applied')
     .eq('id', id)
     .single();
 
@@ -128,7 +135,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'No se encontro el pedido' }, { status: 404 });
   }
 
-  if (STOCK_COMMITTED_STATUSES.includes(order.status)) {
+  if (order.stock_applied) {
     const { error: stockError } = await serviceClient.rpc(
       'apply_order_stock_change' as never,
       { p_order_id: id, p_direction: 'restore' } as never,

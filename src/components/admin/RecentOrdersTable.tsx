@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { formatPrice } from '@/lib/format';
+import { orderStatusLabel, paymentStatusLabel } from '@/lib/orderStatus';
 
 interface OrderRow {
   id: string;
@@ -41,8 +42,8 @@ export function RecentOrdersTable({ orders }: { orders: OrderRow[] }) {
                 </Link>
               </td>
               <td className="mono" style={{ fontWeight: 600 }}>{formatPrice(order.total)}</td>
-              <td><span className="status-badge" data-status={order.status}>{order.status}</span></td>
-              <td><span className="status-badge" data-status={order.payment_status}>{order.payment_status}</span></td>
+              <td><span className="status-badge" data-status={order.status}>{orderStatusLabel(order.status)}</span></td>
+              <td><span className="status-badge" data-status={order.payment_status}>{paymentStatusLabel(order.payment_status)}</span></td>
               <td style={{ fontSize: 13, color: 'var(--text-faint)' }}>
                 {new Date(order.created_at).toLocaleDateString('es-PE')}
               </td>

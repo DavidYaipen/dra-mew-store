@@ -5,10 +5,20 @@ import { formatPrice } from '@/lib/format';
 import { ArrowLeftIcon } from '@/components/admin/AdminIcons';
 import { AdminOrderActions } from '@/components/admin/AdminOrderActions';
 import { AdminOrderCustomerForm } from '@/components/admin/AdminOrderCustomerForm';
-import { ProductImage } from '@/components/ui/ProductImage';
+import { AdminOrderItemsEditor } from '@/components/admin/AdminOrderItemsEditor';
+import { paymentStatusLabel } from '@/lib/orderStatus';
 import type { OrderItem, OrderStatus, ShippingAddress } from '@/lib/types';
 
+const EDITABLE_STATUSES: OrderStatus[] = ['pending', 'confirmed'];
+
 export const dynamic = 'force-dynamic';
+
+const SHIPPING_METHOD_LABELS: Record<string, string> = {
+  standard: 'Delivery',
+  express: 'Express',
+  pickup_fullmarket: 'Recojo en Full Market',
+  pickup_expocentro: 'Recojo en Expo Centro',
+};
 
 interface OrderWithRelations {
   id: string;
@@ -70,8 +80,12 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
           </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span className="status-badge" data-status={typedOrder.payment_status}>{typedOrder.payment_status}</span>
-          <AdminOrderActions orderId={typedOrder.id} currentStatus={typedOrder.status} />
+          <span className="status-badge" data-status={typedOrder.payment_status}>{paymentStatusLabel(typedOrder.payment_status)}</span>
+          <AdminOrderActions
+            orderId={typedOrder.id}
+            currentStatus={typedOrder.status}
+            currentPaymentStatus={typedOrder.payment_status}
+          />
         </div>
       </div>
 
@@ -81,39 +95,10 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
             <div className="admin-card-header">
               <h3 className="admin-card-title">Productos</h3>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {typedItems.map((item) => (
-                <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  {item.image && <ProductImage src={item.image} alt={item.name} size={48} />}
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, fontSize: 14 }}>
-                      {item.name}
-                      {item.is_preorder && (
-                        <span
-                          style={{
-                            marginLeft: 8,
-                            padding: '2px 8px',
-                            borderRadius: 999,
-                            fontSize: 10,
-                            fontWeight: 700,
-                            background: '#ede9fe',
-                            color: '#6d28d9',
-                          }}
-                        >
-                          Preventa
-                        </span>
-                      )}
-                    </div>
-                    <div style={{ fontSize: 13, color: 'var(--text-faint)' }}>
-                      {formatPrice(item.price)} x {item.quantity}
-                    </div>
-                  </div>
-                  <div className="mono" style={{ fontWeight: 600 }}>
-                    {formatPrice(item.price * item.quantity)}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <AdminOrderItemsEditor
+              items={typedItems}
+              editable={EDITABLE_STATUSES.includes(typedOrder.status)}
+            />
           </div>
 
           <div className="admin-card">
@@ -161,7 +146,11 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: 'var(--text-faint)' }}>Metodo de envio</span>
-                <span>{typedOrder.shipping_method || '—'}</span>
+                <span>
+                  {typedOrder.shipping_method
+                    ? SHIPPING_METHOD_LABELS[typedOrder.shipping_method] ?? typedOrder.shipping_method
+                    : '—'}
+                </span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: 'var(--text-faint)' }}>WhatsApp enviado</span>

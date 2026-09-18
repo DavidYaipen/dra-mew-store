@@ -1,6 +1,7 @@
 import { requireAdmin } from '@/lib/supabase/admin';
 import { formatPrice } from '@/lib/format';
 import { AdminOrderActions } from '@/components/admin/AdminOrderActions';
+import { orderStatusLabel, paymentStatusLabel } from '@/lib/orderStatus';
 
 export const dynamic = 'force-dynamic';
 
@@ -77,13 +78,17 @@ export default async function AdminOrdersPage() {
                     </div>
                   </td>
                   <td className="mono" style={{ fontWeight: 600 }}>{formatPrice(order.total)}</td>
-                  <td><span className="status-badge" data-status={order.status}>{order.status}</span></td>
-                  <td><span className="status-badge" data-status={order.payment_status}>{order.payment_status}</span></td>
+                  <td><span className="status-badge" data-status={order.status}>{orderStatusLabel(order.status)}</span></td>
+                  <td><span className="status-badge" data-status={order.payment_status}>{paymentStatusLabel(order.payment_status)}</span></td>
                   <td style={{ fontSize: 13, color: 'var(--text-faint)' }}>
                     {new Date(order.created_at).toLocaleDateString('es-PE')}
                   </td>
                   <td>
-                    <AdminOrderActions orderId={order.id} currentStatus={order.status} />
+                    <AdminOrderActions
+                      orderId={order.id}
+                      currentStatus={order.status}
+                      currentPaymentStatus={order.payment_status}
+                    />
                   </td>
                 </tr>
               ))}

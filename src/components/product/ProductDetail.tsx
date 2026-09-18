@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { Product } from '@/lib/types';
 import { discountLabel, formatEuro } from '@/lib/format';
+import { isProductSoldOut, remainingQty } from '@/lib/stock';
 import { useStore } from '@/store/useStore';
 import { Button } from '@/components/ui/Button';
 import { ProductImage } from '@/components/ui/ProductImage';
@@ -10,26 +11,36 @@ import { HeartIcon } from '@/components/ui/Icons';
 import styles from './ProductDetail.module.css';
 
 function stockStatus(product: Product): { label: string; level: 'ok' | 'low' | 'out' | 'preorder' } {
+  if (isProductSoldOut(product)) return { label: 'Agotado', level: 'out' };
   if (product.is_preorder) {
     return {
-      label: product.preorder_note ? `Preventa · ${product.preorder_note}` : 'Preventa',
+      label: product.preorder_note ? `Se puede pre-ordenar · ${product.preorder_note}` : 'Se puede pre-ordenar',
       level: 'preorder',
     };
   }
   const stock = product.stock;
   if (stock === undefined) return { label: 'En stock · listo para enviar', level: 'ok' };
-  if (stock === 0) return { label: 'Agotado', level: 'out' };
   if (stock <= 5) return { label: `¡Últimas ${stock} unidades!`, level: 'low' };
   return { label: 'En stock · listo para enviar', level: 'ok' };
 }
 
 export function ProductDetail({ product }: { product: Product }) {
-  const { addToCart, toggleWishlist, isWished } = useStore();
+  const { cart, addToCart, toggleWishlist, isWished, showToast } = useStore();
   const [qty, setQty] = useState(1);
   const wished = isWished(product.id);
   const discount = discountLabel(product.price, product.oldPrice);
   const onSale = product.oldPrice != null;
   const stock = stockStatus(product);
+
+  const alreadyInCart =
+    cart.find((l) => l.id === product.id && (l.kind ?? 'product') === 'product')?.qty ?? 0;
+  const { remaining, limitedBy, cap } = remainingQty(product, alreadyInCart);
+  const limitMessage =
+    limitedBy === 'stock'
+      ? 'No hay más stock disponible de este producto.'
+      : limitedBy === 'customer'
+        ? `Este producto tiene un límite de ${cap} unidad(es) por cliente.`
+        : '';
 
   return (
     <div className={styles.layout}>
@@ -38,7 +49,16 @@ export function ProductDetail({ product }: { product: Product }) {
           className={styles.stage}
           style={{ background: `linear-gradient(158deg,#fff, ${product.tint})` }}
         >
-          <ProductImage src={product.image} alt={product.name} size={280} shadow="0 26px 38px rgba(14,15,18,.2)" priority />
+          <ProductImage
+            src={product.image}
+            alt={product.name}
+            fill
+            sizes="(max-width: 860px) 90vw, 45vw"
+            shadow="0 26px 38px rgba(14,15,18,.2)"
+            faded={stock.level === 'out'}
+            priority
+          />
+          {stock.level === 'out' && <span className={styles.soldOut}>SOLD OUT</span>}
           {product.badge && <span className={styles.badge}>{product.badge}</span>}
         </div>
       </div>
@@ -102,12 +122,34 @@ export function ProductDetail({ product }: { product: Product }) {
               −
             </button>
             <span className={styles.qtyValue}>{qty}</span>
-            <button type="button" aria-label="Sumar" onClick={() => setQty((q) => q + 1)}>
+            <button
+              type="button"
+              aria-label="Sumar"
+              onClick={() => {
+                if (qty >= remaining) {
+                  showToast(limitMessage, false, 'warning');
+                  return;
+                }
+                setQty((q) => q + 1);
+              }}
+            >
               +
             </button>
           </div>
           <div className={styles.addWrap}>
-            <Button variant="primary" size="lg" fullWidth onClick={() => addToCart(product.id, qty)}>
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
+              disabled={stock.level === 'out'}
+              onClick={() => {
+                if (qty > remaining) {
+                  showToast(limitMessage, false, 'warning');
+                  return;
+                }
+                addToCart(product.id, qty);
+              }}
+            >
               Añadir al carrito
             </Button>
           </div>

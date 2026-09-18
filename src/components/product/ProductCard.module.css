@@ -17,7 +17,10 @@
 
 .imageWrap {
   position: relative;
-  height: 200px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  padding: 18px;
+  box-sizing: border-box;
   display: grid;
   place-items: center;
 }
@@ -49,6 +52,34 @@
   border-radius: 999px;
 }
 
+.preorderBadge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  background: #7c3aed;
+  padding: 4px 9px;
+  border-radius: 999px;
+}
+
+.soldOut {
+  position: absolute;
+  z-index: 1;
+  place-self: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #dc2626;
+  background: #fff;
+  padding: 6px 16px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+}
+
 .wish {
   position: absolute;
   top: 10px;
@@ -75,7 +106,13 @@
 .name {
   font-weight: 700;
   font-size: 15px;
+  line-height: 1.3;
   color: var(--text-strong);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: calc(1.3em * 2);
 }
 
 .cat {
@@ -134,4 +171,9 @@
 }
 .addBtn:hover {
   filter: brightness(1.06);
+}
+.addBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
 }

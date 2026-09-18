@@ -1,12 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 import { createServiceClient } from '@/lib/supabase/service';
 import { WHATSAPP_PHONE } from '@/lib/constants';
 import type { CheckoutPayload } from '@/lib/types';
 
 const STORE_URL = 'https://dra-mew-store.vercel.app';
 
+const PICKUP_LABELS: Record<string, string> = {
+  pickup_fullmarket: 'Recojo en Full Market',
+  pickup_expocentro: 'Recojo en Expo Centro',
+};
+
 export async function POST(request: NextRequest) {
   try {
+    const authClient = await createClient();
+    const {
+      data: { user },
+    } = await authClient.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Debes iniciar sesión para completar el pedido.' }, { status: 401 });
+    }
+
     const payload: CheckoutPayload = await request.json();
     const supabase = createServiceClient();
 
@@ -44,9 +58,19 @@ export async function POST(request: NextRequest) {
     const { data: products } = productIds.length
       ? await supabase
           .from('products')
-          .select('id, name, price, image, stock, is_preorder')
+          .select('id, name, price, image, stock, is_preorder, max_qty_per_customer')
           .in('id', productIds)
-      : { data: [] as Array<{ id: number; name: string; price: number; image: string; stock: number | null; is_preorder: boolean }> };
+      : {
+          data: [] as Array<{
+            id: number;
+            name: string;
+            price: number;
+            image: string;
+            stock: number | null;
+            is_preorder: boolean;
+            max_qty_per_customer: number | null;
+          }>,
+        };
 
     if (!products) {
       return NextResponse.json({ error: 'Error al consultar productos' }, { status: 500 });
@@ -75,13 +99,14 @@ export async function POST(request: NextRequest) {
     }
     const binderListings = binderListingsResult.data as unknown as BinderListingRow[];
 
-    // 2b. Validar disponibilidad (chequeo optimista; el descuento real y la
-    // validación atómica final ocurren recién al confirmar el pedido).
-    // Los items en preventa se saltan esta validación: se pueden vender
-    // aunque no haya stock real todavía.
+    // 2b. Validar disponibilidad (chequeo optimista y amigable; el descuento
+    // real y la validación atómica final ocurren al llamar a
+    // apply_order_stock_change más abajo). La preventa de productos ya no
+    // se salta esta validación: su stock es real y limitado igual que
+    // cualquier otro producto.
     for (const line of productLines) {
       const product = products.find((p) => p.id === line.id);
-      if (!product?.is_preorder && product?.stock != null && product.stock < line.qty) {
+      if (product?.stock != null && product.stock < line.qty) {
         return NextResponse.json(
           { error: `Solo quedan ${product.stock} unidades de ${product.name} disponibles.` },
           { status: 400 },
@@ -159,20 +184,116 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. Calcular envío
-    const shippingCost = subtotal >= 150 ? 0 : 14.90;
+    const isPickup = payload.shipping_method in PICKUP_LABELS;
+    const shippingCost = isPickup ? 0 : subtotal >= 150 ? 0 : 14.90;
     const total = Math.max(0, subtotal - discount + shippingCost);
 
-    // 6. Crear customer
-    const { data: customer, error: customerError } = await supabase
-      .from('customers')
-      .upsert(
-        { email: payload.customer.email, name: payload.customer.name, phone: payload.customer.phone },
-        { onConflict: 'email' },
-      )
-      .select('id')
-      .single();
+    // 6. Crear/vincular customer: primero por user_id (cuenta ya vinculada);
+    // si no existe, por email (cliente antiguo sin cuenta vinculada aún); si
+    // tampoco existe, se crea de cero. `customers` tiene dos columnas UNIQUE
+    // (email y user_id) y un solo upsert con onConflict solo cubre una de
+    // las dos, así que se resuelve con esta búsqueda explícita.
+    let customer: { id: string };
 
-    if (customerError) throw customerError;
+    const byUserId = await supabase.from('customers').select('id').eq('user_id', user.id).maybeSingle();
+    if (byUserId.error) throw byUserId.error;
+
+    if (byUserId.data) {
+      const { data, error } = await supabase
+        .from('customers')
+        .update({ email: payload.customer.email, name: payload.customer.name, phone: payload.customer.phone })
+        .eq('id', byUserId.data.id)
+        .select('id')
+        .single();
+      if (error) throw error;
+      customer = data;
+    } else {
+      const byEmail = await supabase
+        .from('customers')
+        .select('id')
+        .eq('email', payload.customer.email)
+        .maybeSingle();
+      if (byEmail.error) throw byEmail.error;
+
+      if (byEmail.data) {
+        const { data, error } = await supabase
+          .from('customers')
+          .update({ user_id: user.id, name: payload.customer.name, phone: payload.customer.phone })
+          .eq('id', byEmail.data.id)
+          .select('id')
+          .single();
+        if (error) throw error;
+        customer = data;
+      } else {
+        const { data, error } = await supabase
+          .from('customers')
+          .insert({
+            user_id: user.id,
+            email: payload.customer.email,
+            name: payload.customer.name,
+            phone: payload.customer.phone,
+          })
+          .select('id')
+          .single();
+        if (error) throw error;
+        customer = data;
+      }
+    }
+
+    // 6b. Límite de cantidad por cliente (acumulado entre todos sus pedidos
+    // no cancelados/reembolsados). Solo aplica a productos con
+    // max_qty_per_customer definido; el binder queda fuera de alcance.
+    const limitedProducts = productLines
+      .map((line) => ({ line, product: products.find((p) => p.id === line.id) }))
+      .filter(
+        (
+          entry,
+        ): entry is { line: (typeof productLines)[number]; product: NonNullable<typeof entry.product> } =>
+          entry.product != null && entry.product.max_qty_per_customer != null,
+      );
+
+    if (limitedProducts.length) {
+      const { data: pastOrders } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('customer_id', customer.id)
+        .not('status', 'in', '(cancelled,refunded)');
+
+      const pastOrderIds = (pastOrders ?? []).map((o) => o.id);
+      const { data: pastItems } = pastOrderIds.length
+        ? await supabase
+            .from('order_items')
+            .select('product_id, quantity')
+            .in('order_id', pastOrderIds)
+            .in(
+              'product_id',
+              limitedProducts.map((entry) => entry.product.id),
+            )
+        : { data: [] as Array<{ product_id: number | null; quantity: number }> };
+
+      const pastQtyByProduct = new Map<number, number>();
+      for (const item of pastItems ?? []) {
+        if (item.product_id == null) continue;
+        pastQtyByProduct.set(item.product_id, (pastQtyByProduct.get(item.product_id) ?? 0) + item.quantity);
+      }
+
+      for (const { line, product } of limitedProducts) {
+        const max = product.max_qty_per_customer!;
+        const alreadyOrdered = pastQtyByProduct.get(product.id) ?? 0;
+        if (alreadyOrdered + line.qty > max) {
+          const remaining = Math.max(0, max - alreadyOrdered);
+          return NextResponse.json(
+            {
+              error:
+                remaining > 0
+                  ? `Ya pediste ${alreadyOrdered} unidad(es) de "${product.name}". Solo puedes pedir ${remaining} más (límite de ${max} por cliente).`
+                  : `Ya alcanzaste el límite de ${max} unidad(es) de "${product.name}" por cliente.`,
+            },
+            { status: 400 },
+          );
+        }
+      }
+    }
 
     // 7. Crear order
     const { data: order, error: orderError } = await supabase
@@ -209,20 +330,42 @@ export async function POST(request: NextRequest) {
     const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
     if (itemsError) throw itemsError;
 
+    // 8b. Descontar stock real de forma atómica al momento del pedido (no
+    // se espera a que un admin confirme). Si falla (p. ej. carrera con otro
+    // pedido que agotó el stock), se revierte el pedido recién creado.
+    const { error: stockError } = await supabase.rpc('apply_order_stock_change' as never, {
+      p_order_id: order.id,
+      p_direction: 'decrement',
+    } as never);
+    if (stockError) {
+      await supabase.from('orders').delete().eq('id', order.id);
+      return NextResponse.json(
+        { error: 'Uno o más productos ya no tienen stock suficiente. Actualiza tu carrito e inténtalo de nuevo.' },
+        { status: 409 },
+      );
+    }
+
     // 9. Actualizar uso del cupón
     if (couponId) {
       await supabase.rpc('increment_coupon_usage' as never, { coupon_id: couponId } as never);
     }
 
     // 10. Generar mensaje de WhatsApp
-    const shippingLabel = payload.shipping_method === 'express' ? 'Express' : 'Delivery';
-    const addressParts = [
-      payload.shipping_address.street,
-      payload.shipping_address.city,
-      payload.shipping_address.state,
-      payload.shipping_address.country,
-    ].filter(Boolean);
-    const fullAddress = addressParts.join(', ') || 'No especificada';
+    const shippingLabel = isPickup
+      ? PICKUP_LABELS[payload.shipping_method]
+      : payload.shipping_method === 'express'
+        ? 'Express'
+        : 'Delivery';
+    const fullAddress = isPickup
+      ? shippingLabel
+      : [
+          payload.shipping_address?.street,
+          payload.shipping_address?.city,
+          payload.shipping_address?.state,
+          payload.shipping_address?.country,
+        ]
+          .filter(Boolean)
+          .join(', ') || 'No especificada';
 
     const whatsappMessage = generateWhatsAppMessage({
       orderNumber: order.order_number,

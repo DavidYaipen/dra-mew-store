@@ -36,6 +36,7 @@ interface ProductRow {
   stock: number | null;
   is_preorder: boolean;
   preorder_note: string | null;
+  max_qty_per_customer: number | null;
 }
 
 function rowToProduct(row: ProductRow, stock?: number): Product {
@@ -56,6 +57,7 @@ function rowToProduct(row: ProductRow, stock?: number): Product {
     origin: (row.origin as 'official' | 'generic') ?? undefined,
     is_preorder: row.is_preorder,
     preorder_note: row.preorder_note ?? undefined,
+    max_qty_per_customer: row.max_qty_per_customer ?? undefined,
   };
 }
 

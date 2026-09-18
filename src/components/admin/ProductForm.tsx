@@ -88,6 +88,8 @@ export function ProductForm({ initialData }: { initialData?: Record<string, unkn
       stock: form.get('stock') !== '' ? Number(form.get('stock')) : null,
       is_preorder: form.get('is_preorder') === 'on',
       preorder_note: form.get('preorder_note') || null,
+      max_qty_per_customer:
+        form.get('max_qty_per_customer') !== '' ? Number(form.get('max_qty_per_customer')) : null,
     };
 
     try {
@@ -181,15 +183,17 @@ export function ProductForm({ initialData }: { initialData?: Record<string, unkn
       </div>
 
       <div className="form-group">
-        <label htmlFor="stock">Stock - opcional (solo para productos sin variantes)</label>
+        <label htmlFor="stock">Stock (solo para productos sin variantes)</label>
         <input
           id="stock"
           name="stock"
           type="number"
           step="1"
           min="0"
-          defaultValue={initialData?.stock != null ? (initialData.stock as number) : ''}
-          placeholder="Vacío = sin control de stock"
+          required
+          defaultValue={
+            initialData?.stock != null ? (initialData.stock as number) : initialData ? '' : 0
+          }
         />
         <div style={{ fontSize: 12, color: 'var(--text-faint)', marginTop: 4 }}>
           Si el producto tiene variantes, el stock se gestiona por variante más abajo en{' '}
@@ -207,7 +211,8 @@ export function ProductForm({ initialData }: { initialData?: Record<string, unkn
             onChange={(e) => setIsPreorder(e.target.checked)}
             style={{ width: 18, height: 18 }}
           />
-          Disponible en preventa (se puede comprar aunque no haya stock todavía)
+          Disponible en preventa (aviso &quot;Se puede pre-ordenar&quot; en la tienda — el stock
+          de arriba sigue aplicando normalmente, no es ilimitado)
         </label>
         {isPreorder && (
           <input
@@ -218,6 +223,27 @@ export function ProductForm({ initialData }: { initialData?: Record<string, unkn
             style={{ marginTop: 8 }}
           />
         )}
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="max_qty_per_customer">Límite por cliente - opcional</label>
+        <input
+          id="max_qty_per_customer"
+          name="max_qty_per_customer"
+          type="number"
+          step="1"
+          min="1"
+          defaultValue={
+            initialData?.max_qty_per_customer != null
+              ? (initialData.max_qty_per_customer as number)
+              : ''
+          }
+          placeholder="Vacío = sin límite"
+        />
+        <div style={{ fontSize: 12, color: 'var(--text-faint)', marginTop: 4 }}>
+          Máximo de unidades de este producto que un mismo cliente puede pedir en total,
+          acumulado entre todos sus pedidos.
+        </div>
       </div>
 
       {/* Image Upload Section */}

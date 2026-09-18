@@ -13,8 +13,8 @@ export function Toast() {
 
   return (
     <div className={styles.toast} role="status" aria-live="polite">
-      <span className={styles.check} aria-hidden>
-        ✓
+      <span className={styles.check} data-kind={toast.kind} aria-hidden>
+        {toast.kind === 'warning' ? '!' : '✓'}
       </span>
       {toast.message}
       {toast.cta && (

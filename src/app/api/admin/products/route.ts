@@ -34,9 +34,10 @@ export async function POST(request: NextRequest) {
       tint: body.tint,
       badge: body.badge,
       is_featured: body.is_featured,
-      stock: body.stock ?? null,
+      stock: body.stock ?? 0,
       is_preorder: body.is_preorder ?? false,
       preorder_note: body.preorder_note ?? null,
+      max_qty_per_customer: body.max_qty_per_customer ?? null,
     })
     .select('id');
 

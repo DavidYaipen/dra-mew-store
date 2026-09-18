@@ -29,6 +29,9 @@
   font-size: 11px;
   flex: 0 0 auto;
 }
+.check[data-kind='warning'] {
+  background: #d97706;
+}
 
 .cta {
   margin-left: 5px;

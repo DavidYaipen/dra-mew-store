@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { formatEuro } from '@/lib/format';
 import { shippingProgress } from '@/lib/cart';
+import { remainingQty } from '@/lib/stock';
 import { useStore } from '@/store/useStore';
 import { ProductImage } from '@/components/ui/ProductImage';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -12,7 +13,12 @@ import styles from './CartView.module.css';
 const FINISH_LABELS: Record<string, string> = { comun: 'Común', holo: 'Holo', reverse: 'Reverse' };
 
 export function CartView() {
-  const { cart, subtotal, changeQty, removeFromCart, getProduct, getBinderListing } = useStore();
+  const { cart, subtotal, changeQty, removeFromCart, getProduct, getBinderListing, showToast } = useStore();
+
+  const limitMessage = (limitedBy: 'stock' | 'customer', cap?: number) =>
+    limitedBy === 'stock'
+      ? 'No hay más stock disponible de este producto.'
+      : `Este producto tiene un límite de ${cap} unidad(es) por cliente.`;
 
   if (cart.length === 0) {
     return (
@@ -100,7 +106,18 @@ export function CartView() {
                     −
                   </button>
                   <span className={styles.qtyValue}>{line.qty}</span>
-                  <button type="button" aria-label="Sumar" onClick={() => changeQty(line.id, 1)}>
+                  <button
+                    type="button"
+                    aria-label="Sumar"
+                    onClick={() => {
+                      const { remaining, limitedBy, cap } = remainingQty(product, line.qty);
+                      if (remaining < 1) {
+                        showToast(limitMessage(limitedBy!, cap), false, 'warning');
+                        return;
+                      }
+                      changeQty(line.id, 1);
+                    }}
+                  >
                     +
                   </button>
                 </div>

@@ -39,7 +39,7 @@ describe('StoreProvider', () => {
     const { result } = renderHook(() => useStore(), { wrapper });
     await waitFor(() => expect(result.current.productMap.size).toBe(CATALOG.length));
     act(() => result.current.addToCart(1, 1));
-    expect(result.current.toast).toEqual({ message: 'Añadido al carrito', cta: true });
+    expect(result.current.toast).toEqual({ message: 'Añadido al carrito', cta: true, kind: 'success' });
   });
 
   it('persiste el carrito en localStorage', async () => {

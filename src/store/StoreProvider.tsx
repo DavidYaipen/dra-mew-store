@@ -22,6 +22,8 @@ export interface ToastState {
   message: string;
   /** Muestra la acción rápida "Ver carrito →". */
   cta: boolean;
+  /** 'warning' se usa para avisos de límite de stock/cantidad. */
+  kind: 'success' | 'warning';
 }
 
 export interface StoreContextValue {
@@ -38,9 +40,10 @@ export interface StoreContextValue {
   addToCart: (id: CartLine['id'], qty?: number, kind?: NonNullable<CartLine['kind']>) => void;
   changeQty: (id: CartLine['id'], delta: number, kind?: NonNullable<CartLine['kind']>) => void;
   removeFromCart: (id: CartLine['id'], kind?: NonNullable<CartLine['kind']>) => void;
+  clearCart: () => void;
   toggleWishlist: (id: number) => void;
   isWished: (id: number) => boolean;
-  showToast: (message: string, cta?: boolean) => void;
+  showToast: (message: string, cta?: boolean, kind?: 'success' | 'warning') => void;
   dismissToast: () => void;
 }
 
@@ -109,9 +112,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => () => clearTimeout(toastTimer.current), []);
 
-  const showToast = useCallback((message: string, cta = false) => {
+  const showToast = useCallback((message: string, cta = false, kind: 'success' | 'warning' = 'success') => {
     clearTimeout(toastTimer.current);
-    setToast({ message, cta });
+    setToast({ message, cta, kind });
     toastTimer.current = setTimeout(() => setToast(null), cta ? 2600 : 1900);
   }, []);
 
@@ -141,6 +144,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     },
     [],
   );
+
+  const clearCart = useCallback(() => setCart([]), []);
 
   const toggleWishlist = useCallback(
     (id: number) => {
@@ -180,6 +185,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       addToCart,
       changeQty,
       removeFromCart,
+      clearCart,
       toggleWishlist,
       isWished,
       showToast,
@@ -196,6 +202,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       addToCart,
       changeQty,
       removeFromCart,
+      clearCart,
       toggleWishlist,
       isWished,
       showToast,

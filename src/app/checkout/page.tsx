@@ -20,7 +20,7 @@ interface OrderResult {
 }
 
 export default function CheckoutPage() {
-  const { cart, subtotal, getProduct, getBinderListing, showToast } = useStore();
+  const { cart, subtotal, getProduct, getBinderListing, showToast, clearCart } = useStore();
   const [step, setStep] = useState<'data' | 'shipping' | 'payment' | 'confirming'>('data');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<OrderResult | null>(null);
@@ -41,7 +41,8 @@ export default function CheckoutPage() {
     notes: '',
   });
 
-  const shippingCost = subtotal >= 150 ? 0 : 14.90;
+  const isPickup = form.shipping_method.startsWith('pickup_');
+  const shippingCost = isPickup ? 0 : subtotal >= 150 ? 0 : 14.90;
   const total = Math.max(0, subtotal - couponDiscount + shippingCost);
 
   // Redirect to WhatsApp after order
@@ -63,15 +64,17 @@ export default function CheckoutPage() {
     try {
       const payload = {
         customer: { name: form.name, email: form.email, phone: form.phone },
-        shipping_address: {
-          name: form.name,
-          street: form.street,
-          city: form.city,
-          state: form.state,
-          zip: form.zip,
-          country: form.country,
-          phone: form.phone,
-        },
+        shipping_address: isPickup
+          ? undefined
+          : {
+              name: form.name,
+              street: form.street,
+              city: form.city,
+              state: form.state,
+              zip: form.zip,
+              country: form.country,
+              phone: form.phone,
+            },
         shipping_method: form.shipping_method,
         payment_method: form.payment_method,
         coupon_code: appliedCoupon?.code,
@@ -89,6 +92,7 @@ export default function CheckoutPage() {
       if (!res.ok) throw new Error(data.error);
 
       setResult(data);
+      clearCart();
       showToast('¡Pedido realizado con éxito!');
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Error al procesar';
@@ -201,33 +205,7 @@ export default function CheckoutPage() {
           {/* Step 2: Envío */}
           {step === 'shipping' && (
             <div className={styles.section}>
-              <h2 className={styles.sectionTitle}>Dirección de envío</h2>
-              <div className={styles.field}>
-                <label>Dirección *</label>
-                <input value={form.street} onChange={(e) => updateField('street', e.target.value)} required placeholder="Calle, número, urbanización" />
-              </div>
-              <div className={styles.fieldRow}>
-                <div className={styles.field}>
-                  <label>Ciudad *</label>
-                  <input value={form.city} onChange={(e) => updateField('city', e.target.value)} required />
-                </div>
-                <div className={styles.field}>
-                  <label>Provincia *</label>
-                  <input value={form.state} onChange={(e) => updateField('state', e.target.value)} required />
-                </div>
-              </div>
-              <div className={styles.fieldRow}>
-                <div className={styles.field}>
-                  <label>Código postal</label>
-                  <input value={form.zip} onChange={(e) => updateField('zip', e.target.value)} />
-                </div>
-                <div className={styles.field}>
-                  <label>País</label>
-                  <input value={form.country} onChange={(e) => updateField('country', e.target.value)} />
-                </div>
-              </div>
-
-              <h2 className={styles.sectionTitle}>Método de envío</h2>
+              <h2 className={styles.sectionTitle}>Método de entrega</h2>
               <div className={styles.radioGroup}>
                 <label className={styles.radio}>
                   <input
@@ -237,7 +215,7 @@ export default function CheckoutPage() {
                     checked={form.shipping_method === 'standard'}
                     onChange={(e) => updateField('shipping_method', e.target.value)}
                   />
-                  <span>Delivery — {shippingCost === 0 ? 'Gratis' : formatPrice(shippingCost)}</span>
+                  <span>Envío a domicilio — {subtotal >= 150 ? 'Gratis' : formatPrice(14.9)}</span>
                 </label>
                 <label className={styles.radio}>
                   <input
@@ -247,9 +225,59 @@ export default function CheckoutPage() {
                     checked={form.shipping_method === 'express'}
                     onChange={(e) => updateField('shipping_method', e.target.value)}
                   />
-                  <span>Express (1-2 días) — {formatPrice(shippingCost + 5)}</span>
+                  <span>Envío express (1-2 días) — {formatPrice((subtotal >= 150 ? 0 : 14.9) + 5)}</span>
+                </label>
+                <label className={styles.radio}>
+                  <input
+                    type="radio"
+                    name="shipping"
+                    value="pickup_fullmarket"
+                    checked={form.shipping_method === 'pickup_fullmarket'}
+                    onChange={(e) => updateField('shipping_method', e.target.value)}
+                  />
+                  <span>Recojo en Full Market — Gratis</span>
+                </label>
+                <label className={styles.radio}>
+                  <input
+                    type="radio"
+                    name="shipping"
+                    value="pickup_expocentro"
+                    checked={form.shipping_method === 'pickup_expocentro'}
+                    onChange={(e) => updateField('shipping_method', e.target.value)}
+                  />
+                  <span>Recojo en Expo Centro — Gratis</span>
                 </label>
               </div>
+
+              {!isPickup && (
+                <>
+                  <h2 className={styles.sectionTitle}>Dirección de envío</h2>
+                  <div className={styles.field}>
+                    <label>Dirección *</label>
+                    <input value={form.street} onChange={(e) => updateField('street', e.target.value)} required placeholder="Calle, número, urbanización" />
+                  </div>
+                  <div className={styles.fieldRow}>
+                    <div className={styles.field}>
+                      <label>Ciudad *</label>
+                      <input value={form.city} onChange={(e) => updateField('city', e.target.value)} required />
+                    </div>
+                    <div className={styles.field}>
+                      <label>Provincia *</label>
+                      <input value={form.state} onChange={(e) => updateField('state', e.target.value)} required />
+                    </div>
+                  </div>
+                  <div className={styles.fieldRow}>
+                    <div className={styles.field}>
+                      <label>Código postal</label>
+                      <input value={form.zip} onChange={(e) => updateField('zip', e.target.value)} />
+                    </div>
+                    <div className={styles.field}>
+                      <label>País</label>
+                      <input value={form.country} onChange={(e) => updateField('country', e.target.value)} />
+                    </div>
+                  </div>
+                </>
+              )}
 
               <div className={styles.btnRow}>
                 <button type="button" className={styles.backBtn} onClick={() => setStep('data')}>
@@ -259,7 +287,7 @@ export default function CheckoutPage() {
                   type="button"
                   className={styles.nextBtn}
                   onClick={() => setStep('payment')}
-                  disabled={!form.street || !form.city || !form.state}
+                  disabled={!isPickup && (!form.street || !form.city || !form.state)}
                 >
                   Siguiente →
                 </button>

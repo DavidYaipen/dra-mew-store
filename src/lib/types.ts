@@ -32,10 +32,12 @@ export interface Product {
   material?: string;
   /** Origen: official (Pokemon Center) o generic. */
   origin?: 'official' | 'generic';
-  /** Disponible en preventa: se puede comprar aunque no haya stock real todavía. */
+  /** Disponible en preventa: se muestra como "Se puede pre-ordenar" en la tienda; el stock sigue aplicando normalmente. */
   is_preorder?: boolean;
   /** Nota de preventa (ej. "Llega en octubre"). */
   preorder_note?: string;
+  /** Máximo de unidades que un mismo cliente puede pedir en total. undefined = sin límite. */
+  max_qty_per_customer?: number;
 }
 
 export interface ProductVariant {
@@ -202,7 +204,7 @@ export interface CheckoutPayload {
     email: string;
     phone: string;
   };
-  shipping_address: ShippingAddress;
+  shipping_address?: ShippingAddress;
   shipping_method: string;
   payment_method: string;
   coupon_code?: string;

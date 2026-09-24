@@ -13,12 +13,24 @@ const EDITABLE_STATUSES: OrderStatus[] = ['pending', 'confirmed'];
 
 export const dynamic = 'force-dynamic';
 
-const SHIPPING_METHOD_LABELS: Record<string, string> = {
-  standard: 'Delivery',
-  express: 'Express',
-  pickup_fullmarket: 'Recojo en Full Market',
-  pickup_expocentro: 'Recojo en Expo Centro',
+// Pedidos anteriores a la migración de puntos de recojo administrables
+// guardaron el punto como parte del propio `shipping_method`.
+const LEGACY_PICKUP_LABELS: Record<string, string> = {
+  pickup_fullmarket: 'Recojo en Full Market (histórico)',
+  pickup_expocentro: 'Recojo en Expo Centro (histórico)',
 };
+
+function shippingMethodLabel(order: OrderWithRelations): string {
+  if (order.shipping_method === 'pickup') {
+    return order.pickup_points ? `Recojo en ${order.pickup_points.name}` : 'Recojo (punto no disponible)';
+  }
+  if (order.shipping_method === 'express') return 'Express';
+  if (order.shipping_method === 'standard') return 'Delivery';
+  if (order.shipping_method && LEGACY_PICKUP_LABELS[order.shipping_method]) {
+    return LEGACY_PICKUP_LABELS[order.shipping_method];
+  }
+  return order.shipping_method ?? '—';
+}
 
 interface OrderWithRelations {
   id: string;
@@ -37,6 +49,7 @@ interface OrderWithRelations {
   created_at: string;
   customers: { name: string; email: string; phone: string } | null;
   coupons: { code: string } | null;
+  pickup_points: { name: string; address: string } | null;
 }
 
 export default async function AdminOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -45,7 +58,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
 
   const { data: order } = await serviceClient
     .from('orders')
-    .select('*, customers(name, email, phone), coupons(code)')
+    .select('*, customers(name, email, phone), coupons(code), pickup_points(name, address)')
     .eq('id', id)
     .single();
 
@@ -146,11 +159,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: 'var(--text-faint)' }}>Metodo de envio</span>
-                <span>
-                  {typedOrder.shipping_method
-                    ? SHIPPING_METHOD_LABELS[typedOrder.shipping_method] ?? typedOrder.shipping_method
-                    : '—'}
-                </span>
+                <span>{shippingMethodLabel(typedOrder)}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: 'var(--text-faint)' }}>WhatsApp enviado</span>

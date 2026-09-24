@@ -132,6 +132,24 @@
   margin: 0;
 }
 
+.pickupRadio {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.pickupRadioTop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.radioHint {
+  margin-top: 4px;
+  margin-left: 28px;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
 .btnRow {
   display: flex;
   gap: 12px;

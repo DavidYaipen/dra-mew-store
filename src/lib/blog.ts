@@ -85,7 +85,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <h3>Cartas: Booster 151</h3>
 <p>El set más esperado del año ya está disponible. El Booster 151 incluye todas las especies originales de la primera generación en versiones actualizadas.</p>
 <h3>Ofertas de temporada</h3>
-<p>Durante todo septiembre tendrás envío gratis en pedidos superiores a S/ 150. Además, hemos preparado descuentos exclusivos en artículos seleccionados.</p>
+<p>Durante todo septiembre puedes recoger tu pedido gratis en nuestros puntos de recojo. Además, hemos preparado descuentos exclusivos en artículos seleccionados.</p>
 <p>¡No dejes pasar la oportunidad! Visita nuestra <a href="/productos">tienda</a> y descubre todas las novedades.</p>`,
     image: img('lightning.png'),
     category: 'Novedades',

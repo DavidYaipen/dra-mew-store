@@ -21,7 +21,7 @@ npm run test:e2e     # Playwright (builds, then serves on port 3100)
 ```
 
 Run a single Vitest file: `npm run test -- src/lib/cart.test.ts`
-Run a single Vitest test by name: `npm run test -- -t "free shipping"`
+Run a single Vitest test by name: `npm run test -- -t "shippingCost"`
 
 One-off scripts (run with `npx tsx`, load `.env.local` themselves):
 - `scripts/migrate-images.ts` — uploads the local placeholder images into the Supabase `products` storage bucket.
@@ -39,15 +39,16 @@ Requires `.env.local` with:
 The product catalog, orders, coupons, reviews, and auth are backed by **Supabase** (Postgres + Auth + Storage) — this is not a static/localStorage-only app. Cart and wishlist are the one piece of state that stays client-only.
 
 - **`src/lib/`** — pure logic and data, mostly no React.
-  - `cart.ts` — pure cart math: `addLine`, `changeQty`, `removeLine`, `cartCount`, `subtotal`, `shippingProgress`, `FREE_SHIPPING_THRESHOLD` (S/ 150).
+  - `cart.ts` — pure cart math: `addLine`, `changeQty`, `removeLine`, `cartCount`, `subtotal`, `shippingCost` (envío a domicilio S/14.90 / express S/19.90 / recojo en tienda gratis).
   - `catalog.ts` — a **hardcoded** `CATALOG` array kept only as a test fixture (used by `ProductCard.test.tsx`, `StoreProvider.test.tsx`, `catalog.test.ts`). Live pages do **not** import this — see `lib/supabase/catalog.ts` below. Don't add products here expecting them to appear in the app.
   - `supabase/catalog.ts` — the real, DB-backed catalog: `getCatalog`, `getProductFromDB`, `relatedProductsFromDB`, `getFeaturedProducts`, `getCategoryCounts`, all wrapped in React `cache()` and reading from the Supabase `products` table via the service client. This is what `/productos`, `/producto/[id]`, `/categoria/[slug]`, and the `/api/catalog`, `/api/categories`, `/api/products/featured` routes use.
+  - `supabase/pickupPoints.ts` — `getActivePickupPoints()`, same `cache()` convention as `getCatalog`, reads the DB-backed `pickup_points` table for the checkout's "recojo en tienda" options and the `/ayuda` envíos tab.
   - `supabase/{client,server,service}.ts` — three Supabase client factories: `client.ts` (browser, cookies via `@supabase/ssr`), `server.ts` (Server Components/Actions, cookie read/write, awaits `cookies()`), `service.ts` (`createServiceClient`, no cookies — for `generateStaticParams`, `generateMetadata`, and any read that needs to bypass request context).
   - `supabase/auth.ts` — server actions (`'use server'`): `login`, `signup`, `resendConfirmation`, `logout`, `getUser`, `getSession`.
   - `supabase/admin.ts` — `requireAdmin()`: redirects to `/login` if unauthenticated, to `/` if authenticated but not in `ADMIN_EMAILS`; returns `{ user, supabase, serviceClient }` for use in admin pages/routes.
   - `filter.ts` — `filterProducts(catalog, filter)` with `ProductFilter` (cat/query/onlyNew/onlySale).
   - `listing.ts` — `resolveListing(params)` translates URL query (`?cat ?q ?new ?sale`) into a filter + page title.
-  - `format.ts`, `types.ts` (all domain types: `Product`, `CartLine`, `Order`, `Customer`, `Coupon`, `ShippingMethod`, `CheckoutPayload`, `Review`, etc.), `constants.ts` (`STORE_NAME`, `WHATSAPP_PHONE`, `WHATSAPP_MESSAGE`), `faq.ts`, `categories.ts` (static category-page copy for `/categoria/[slug]`), `blog.ts` (hardcoded `BLOG_POSTS` for `/blog`), `reviews.ts` (hardcoded testimonial data — unrelated to the DB-backed `Review`/`reseñas` admin flow), `analytics.ts` (GA/Meta Pixel event helpers: `trackViewContent`, `trackAddToCart`, `trackBeginCheckout`, `trackPurchase`).
+  - `format.ts`, `types.ts` (all domain types: `Product`, `CartLine`, `Order`, `Customer`, `Coupon`, `ShippingMethod`, `ShippingMethodKey`, `PickupPoint`, `CheckoutPayload`, `Review`, etc.), `constants.ts` (`STORE_NAME`, `WHATSAPP_PHONE`, `WHATSAPP_MESSAGE`, `STANDARD_SHIPPING_COST`, `EXPRESS_SHIPPING_SURCHARGE`), `faq.ts`, `categories.ts` (static category-page copy for `/categoria/[slug]`), `blog.ts` (hardcoded `BLOG_POSTS` for `/blog`), `reviews.ts` (hardcoded testimonial data — unrelated to the DB-backed `Review`/`reseñas` admin flow), `analytics.ts` (GA/Meta Pixel event helpers: `trackViewContent`, `trackAddToCart`, `trackBeginCheckout`, `trackPurchase`).
 - **`src/middleware.ts`** — refreshes the Supabase session on every request and enforces route protection: `/admin*` and `/api/admin/*` require an `ADMIN_EMAILS` match (401/403 JSON for API, redirect for pages); `/cuenta`, `/checkout`, `/pedido` require any authenticated user.
 - **`src/store/`** — single React Context for cart/wishlist/toast. `StoreProvider.tsx` persists cart (`CartLine[]`) and wishlist (`number[]`) to `localStorage` (keys `dmw.cart`, `dmw.wishlist`), delegating cart math to `lib/cart.ts`. It also fetches `/api/catalog` on mount to build a `productMap` (id → `Product`) used to resolve cart/wishlist items — it does **not** import `lib/catalog.ts`. Access via `useStore()` (`src/store/useStore.ts`), which throws outside the provider.
 - **`src/components/`** — UI grouped by domain: `layout/`, `ui/` (Button, Icons, ProductImage, EmptyState), `product/`, `home/`, `cart/`, `wishlist/`, `account/`, `help/`, `admin/`, `blog/`, `reviews/`. Components reading `useStore` or Supabase browser client are `'use client'`. Styling is **CSS Modules** per component (admin panel uses a shared `src/app/admin/admin.css` instead).
@@ -55,9 +56,9 @@ The product catalog, orders, coupons, reviews, and auth are backed by **Supabase
   - Storefront: `/` (home), `/productos` (catalog, filter-driven), `/categoria/[slug]`, `/producto/[id]` (SSG via `generateStaticParams`, reads via the service client), `/carrito`, `/favoritos`, `/blog`, `/blog/[slug]`, `/ayuda`, `/sobre-nosotros`, `/devoluciones`, `/privacidad`, `/terminos`, `/reseñas`.
   - Auth: `/login`, `/registro`, `/olvido-contrasena` (Supabase Auth via `lib/supabase/auth.ts` server actions).
   - Order flow: `/checkout` → `POST /api/checkout` (validates coupon, prices the cart server-side from the DB, creates `customers`/`orders`/`order_items`, bumps coupon usage via RPC, returns a `wa.me` URL with a formatted order summary) → `/pedido/[id]`.
-  - Admin (`/admin/*`, gated by `requireAdmin`): dashboard, `productos` (list/new/edit), `inventario`, `pedidos`, `cupones`, `clientes`, `resenas`. Mirrored by `/api/admin/*` routes (products, inventory, orders, coupons, reviews, upload) for mutations.
-  - Public API: `/api/catalog`, `/api/categories`, `/api/products/featured`, `/api/products/variants`, `/api/coupons` (validation), `/api/orders`, `/api/subscribe`, `/api/revalidate` (ISR revalidation webhook).
-- **`supabase/`** — SQL migrations applied manually against the Supabase project (`migration_ecommerce.sql` is the main schema: products/customers/orders/order_items/coupons; plus `migration_product_details`, `migration_rls_products`, `migration_storage_products`, `migration_add_featured`) and `seed.sql`. There is no migration-runner CLI wired up — apply these by hand in the Supabase SQL editor when the schema changes.
+  - Admin (`/admin/*`, gated by `requireAdmin`): dashboard, `productos` (list/new/edit), `inventario`, `pedidos`, `cupones`, `puntos-recojo`, `clientes`, `resenas`. Mirrored by `/api/admin/*` routes (products, inventory, orders, coupons, puntos-recojo, reviews, upload) for mutations.
+  - Public API: `/api/catalog`, `/api/categories`, `/api/products/featured`, `/api/products/variants`, `/api/coupons` (validation), `/api/pickup-points` (active pickup points for checkout/ayuda), `/api/orders`, `/api/subscribe`, `/api/revalidate` (ISR revalidation webhook).
+- **`supabase/`** — SQL migrations applied manually against the Supabase project (`migration_ecommerce.sql` is the main schema: products/customers/orders/order_items/coupons; plus `migration_product_details`, `migration_rls_products`, `migration_storage_products`, `migration_add_featured`, `migration_pickup_points`) and `seed.sql`. There is no migration-runner CLI wired up — apply these by hand in the Supabase SQL editor when the schema changes.
 
 ### Key conventions
 

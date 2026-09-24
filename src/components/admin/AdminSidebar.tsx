@@ -11,6 +11,7 @@ import {
   UsersIcon,
   StarIcon,
   CardsIcon,
+  MapPinIcon,
 } from '@/components/admin/AdminIcons';
 
 const NAV_ITEMS = [
@@ -19,6 +20,7 @@ const NAV_ITEMS = [
   { href: '/admin/binder', label: 'Binder', icon: CardsIcon },
   { href: '/admin/pedidos', label: 'Pedidos', icon: ShoppingCartIcon },
   { href: '/admin/cupones', label: 'Cupones', icon: TagIcon },
+  { href: '/admin/puntos-recojo', label: 'Puntos de recojo', icon: MapPinIcon },
   { href: '/admin/clientes', label: 'Clientes', icon: UsersIcon },
   { href: '/admin/resenas', label: 'Resenas', icon: StarIcon },
 ];

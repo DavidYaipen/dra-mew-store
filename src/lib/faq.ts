@@ -8,7 +8,7 @@ export const FAQS: FaqItem[] = [
   },
   {
     q: '¿El envío es gratis?',
-    a: 'El envío es gratis en pedidos superiores a S/ 150. Por debajo, aplicamos una tarifa plana de S/ 14.90.',
+    a: 'El envío a domicilio tiene una tarifa plana de S/ 14.90 (S/ 19.90 en express). Si prefieres no pagar envío, recoge tu pedido gratis en uno de nuestros puntos de recojo — elígelo en el checkout.',
   },
   {
     q: '¿Los productos son originales?',

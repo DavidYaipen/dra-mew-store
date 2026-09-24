@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { formatEuro } from '@/lib/format';
-import { shippingProgress } from '@/lib/cart';
 import { remainingQty } from '@/lib/stock';
 import { useStore } from '@/store/useStore';
 import { ProductImage } from '@/components/ui/ProductImage';
@@ -34,8 +33,6 @@ export function CartView() {
       </>
     );
   }
-
-  const ship = shippingProgress(subtotal);
 
   return (
     <>
@@ -137,28 +134,17 @@ export function CartView() {
 
         <aside className={styles.summary}>
           <div className={styles.summaryTitle}>Resumen</div>
-          {ship.free ? (
-            <div className={styles.shipFree}>
-              <span>✓</span> ¡Tienes envío gratis!
-            </div>
-          ) : (
-            <div className={styles.shipBar}>
-              <div className={styles.shipText}>
-                Te faltan <strong className={styles.mono}>{formatEuro(ship.remaining)}</strong> para
-                el envío gratis
-              </div>
-              <div className={styles.track}>
-                <div className={styles.fill} style={{ width: `${ship.pct}%` }} />
-              </div>
-            </div>
-          )}
+          <div className={styles.shipFree}>
+            <span>📍</span> Recoge tu pedido gratis en nuestros puntos de recojo — elige esta opción
+            en el checkout.
+          </div>
           <div className={styles.row}>
             <span>Subtotal</span>
             <span className={styles.mono}>{formatEuro(subtotal)}</span>
           </div>
           <div className={styles.row}>
             <span>Envío</span>
-            <span className={styles.free}>Gratis</span>
+            <span className={styles.mono}>Se calcula en el checkout</span>
           </div>
           <div className={styles.totalRow}>
             <span className={styles.totalLabel}>Total</span>

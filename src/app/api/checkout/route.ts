@@ -2,14 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createServiceClient } from '@/lib/supabase/service';
 import { WHATSAPP_PHONE } from '@/lib/constants';
+import { shippingCost } from '@/lib/cart';
 import type { CheckoutPayload } from '@/lib/types';
 
 const STORE_URL = 'https://dra-mew-store.vercel.app';
 
-const PICKUP_LABELS: Record<string, string> = {
-  pickup_fullmarket: 'Recojo en Full Market',
-  pickup_expocentro: 'Recojo en Expo Centro',
-};
+const VALID_SHIPPING_METHODS = ['standard', 'express', 'pickup'];
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,6 +20,9 @@ export async function POST(request: NextRequest) {
     }
 
     const payload: CheckoutPayload = await request.json();
+    if (!VALID_SHIPPING_METHODS.includes(payload.shipping_method)) {
+      return NextResponse.json({ error: 'Método de envío no válido' }, { status: 400 });
+    }
     const supabase = createServiceClient();
 
     // 1. Validar cupón si se proporciona
@@ -184,9 +185,28 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. Calcular envío
-    const isPickup = payload.shipping_method in PICKUP_LABELS;
-    const shippingCost = isPickup ? 0 : subtotal >= 150 ? 0 : 14.90;
-    const total = Math.max(0, subtotal - discount + shippingCost);
+    const isPickup = payload.shipping_method === 'pickup';
+    let pickupPoint: { id: string; name: string; address: string; schedule: string | null } | null = null;
+    if (isPickup) {
+      if (!payload.pickup_point_id) {
+        return NextResponse.json({ error: 'Selecciona un punto de recojo.' }, { status: 400 });
+      }
+      const { data: point } = await supabase
+        .from('pickup_points')
+        .select('id, name, address, schedule')
+        .eq('id', payload.pickup_point_id)
+        .eq('active', true)
+        .maybeSingle();
+      if (!point) {
+        return NextResponse.json(
+          { error: 'El punto de recojo seleccionado ya no está disponible. Elige otro.' },
+          { status: 400 },
+        );
+      }
+      pickupPoint = point;
+    }
+    const shippingCostValue = shippingCost(payload.shipping_method);
+    const total = Math.max(0, subtotal - discount + shippingCostValue);
 
     // 6. Crear/vincular customer: primero por user_id (cuenta ya vinculada);
     // si no existe, por email (cliente antiguo sin cuenta vinculada aún); si
@@ -302,10 +322,11 @@ export async function POST(request: NextRequest) {
         customer_id: customer.id,
         subtotal,
         discount,
-        shipping_cost: shippingCost,
+        shipping_cost: shippingCostValue,
         total,
         coupon_id: couponId ?? null,
         shipping_method: payload.shipping_method,
+        pickup_point_id: isPickup ? pickupPoint!.id : null,
         shipping_address: payload.shipping_address,
         payment_method: payload.payment_method,
         notes: payload.notes,
@@ -352,12 +373,12 @@ export async function POST(request: NextRequest) {
 
     // 10. Generar mensaje de WhatsApp
     const shippingLabel = isPickup
-      ? PICKUP_LABELS[payload.shipping_method]
+      ? `Recojo en ${pickupPoint!.name}`
       : payload.shipping_method === 'express'
         ? 'Express'
         : 'Delivery';
     const fullAddress = isPickup
-      ? shippingLabel
+      ? `${pickupPoint!.address}${pickupPoint!.schedule ? ` (${pickupPoint!.schedule})` : ''}`
       : [
           payload.shipping_address?.street,
           payload.shipping_address?.city,
@@ -376,7 +397,7 @@ export async function POST(request: NextRequest) {
       address: fullAddress,
       items,
       subtotal,
-      shippingCost,
+      shippingCost: shippingCostValue,
       total,
     });
 

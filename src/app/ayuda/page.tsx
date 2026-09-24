@@ -8,6 +8,7 @@ import { FaqAccordion } from '@/components/help/FaqAccordion';
 import { InfoCards, type InfoCard } from '@/components/help/InfoCards';
 import { ContactForm } from '@/components/help/ContactForm';
 import { LinkButton } from '@/components/ui/Button';
+import { getActivePickupPoints } from '@/lib/supabase/pickupPoints';
 import styles from './page.module.css';
 
 export const metadata: Metadata = { title: 'Centro de ayuda' };
@@ -23,7 +24,7 @@ const ENVIOS: InfoCard[] = [
   {
     icon: 'shield.png',
     title: 'Costes de envío',
-    text: 'Gratis desde S/ 150. Por debajo, una tarifa plana de S/ 14.90.',
+    text: 'Envío a domicilio: S/ 14.90 (S/ 19.90 en express). Recojo en tienda: gratis en nuestros puntos de recojo.',
   },
   {
     icon: 'refresh.png',
@@ -49,6 +50,7 @@ export default async function HelpPage({
 }) {
   const { tab } = await searchParams;
   const active: HelpTab = VALID_TABS.includes(tab as HelpTab) ? (tab as HelpTab) : 'faq';
+  const pickupPoints = active === 'envios' ? await getActivePickupPoints() : [];
 
   return (
     <Section background="#fff" maxWidth={920}>
@@ -69,6 +71,18 @@ export default async function HelpPage({
             costes habituales.
           </p>
           <InfoCards cards={ENVIOS} />
+          {pickupPoints.length > 0 && (
+            <>
+              <h3 style={{ marginTop: 24 }}>Puntos de recojo gratuito</h3>
+              <InfoCards
+                cards={pickupPoints.map((point) => ({
+                  icon: 'shield.png',
+                  title: point.name,
+                  text: [point.address, point.schedule, point.notes].filter(Boolean).join(' · '),
+                }))}
+              />
+            </>
+          )}
         </div>
       )}
 

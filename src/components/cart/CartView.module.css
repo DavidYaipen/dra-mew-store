@@ -128,27 +128,6 @@
   font-weight: 600;
 }
 
-.shipBar {
-  margin-bottom: 16px;
-}
-.shipText {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-}
-.track {
-  height: 7px;
-  border-radius: 999px;
-  background: var(--graphite-200);
-  overflow: hidden;
-}
-.fill {
-  height: 100%;
-  background: var(--pink);
-  border-radius: 999px;
-  transition: width 0.35s var(--ease-out);
-}
-
 .row {
   display: flex;
   justify-content: space-between;
@@ -160,11 +139,6 @@
   font-family: var(--font-mono);
   color: var(--text-body);
 }
-.free {
-  color: var(--green-500);
-  font-weight: 600;
-}
-
 .totalRow {
   display: flex;
   justify-content: space-between;

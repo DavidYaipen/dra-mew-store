@@ -1,8 +1,6 @@
-import type { BinderListing, CartLine, Product } from './types';
+import type { BinderListing, CartLine, Product, ShippingMethodKey } from './types';
 import { getProduct } from './catalog';
-
-/** Umbral de envío gratis (S/). */
-export const FREE_SHIPPING_THRESHOLD = 150;
+import { STANDARD_SHIPPING_COST, EXPRESS_SHIPPING_SURCHARGE } from './constants';
 
 function sameLine(a: CartLine, id: CartLine['id'], kind: NonNullable<CartLine['kind']>): boolean {
   return a.id === id && (a.kind ?? 'product') === kind;
@@ -65,19 +63,8 @@ export function subtotal(
   }, 0);
 }
 
-export interface ShippingProgress {
-  free: boolean;
-  /** Importe que falta para el envío gratis (S/). */
-  remaining: number;
-  /** Progreso 0-100 hacia el umbral. */
-  pct: number;
-}
-
-export function shippingProgress(sub: number): ShippingProgress {
-  const free = sub >= FREE_SHIPPING_THRESHOLD;
-  return {
-    free,
-    remaining: Math.max(0, FREE_SHIPPING_THRESHOLD - sub),
-    pct: Math.min(100, Math.round((sub / FREE_SHIPPING_THRESHOLD) * 100)),
-  };
+/** Costo de envío según el método elegido. El recojo en tienda siempre es gratis. */
+export function shippingCost(method: ShippingMethodKey): number {
+  if (method === 'pickup') return 0;
+  return STANDARD_SHIPPING_COST + (method === 'express' ? EXPRESS_SHIPPING_SURCHARGE : 0);
 }

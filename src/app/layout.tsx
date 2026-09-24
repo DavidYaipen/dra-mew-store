@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     template: `%s · ${STORE_NAME}`,
   },
   description:
-    'Peluches, figuras, cartas y ropa Pokémon originales. Piezas seleccionadas para fans y coleccionistas, con envío gratis desde S/ 150.',
+    'Peluches, figuras, cartas y ropa Pokémon originales. Piezas seleccionadas para fans y coleccionistas, con recojo gratis en nuestros puntos de recojo.',
   metadataBase: new URL('https://dramewstore.com'),
   icons: {
     icon: '/logo/logo.png',

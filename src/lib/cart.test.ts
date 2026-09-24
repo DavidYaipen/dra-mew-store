@@ -1,13 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  FREE_SHIPPING_THRESHOLD,
-  addLine,
-  cartCount,
-  changeQty,
-  removeLine,
-  shippingProgress,
-  subtotal,
-} from './cart';
+import { addLine, cartCount, changeQty, removeLine, shippingCost, subtotal } from './cart';
 import type { BinderListing, CartLine } from './types';
 
 describe('addLine', () => {
@@ -122,18 +114,16 @@ describe('subtotal', () => {
   });
 });
 
-describe('shippingProgress', () => {
-  it('marca envío gratis al alcanzar el umbral', () => {
-    const p = shippingProgress(FREE_SHIPPING_THRESHOLD);
-    expect(p.free).toBe(true);
-    expect(p.remaining).toBe(0);
-    expect(p.pct).toBe(100);
+describe('shippingCost', () => {
+  it('cobra la tarifa estándar para delivery normal', () => {
+    expect(shippingCost('standard')).toBe(14.9);
   });
 
-  it('calcula lo que falta y el progreso por debajo del umbral', () => {
-    const p = shippingProgress(20);
-    expect(p.free).toBe(false);
-    expect(p.remaining).toBeCloseTo(130, 2);
-    expect(p.pct).toBe(13); // round(20/150*100)
+  it('cobra estándar + recargo para express', () => {
+    expect(shippingCost('express')).toBeCloseTo(19.9, 2);
+  });
+
+  it('el recojo en tienda siempre es gratis', () => {
+    expect(shippingCost('pickup')).toBe(0);
   });
 });

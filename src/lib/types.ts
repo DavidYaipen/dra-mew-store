@@ -196,6 +196,21 @@ export interface ShippingMethod {
   free_threshold?: number;
 }
 
+export type ShippingMethodKey = 'standard' | 'express' | 'pickup';
+
+// ─── Pickup points ───────────────────────────────────────────
+
+export interface PickupPoint {
+  id: string;
+  name: string;
+  address: string;
+  schedule?: string;
+  notes?: string;
+  active: boolean;
+  display_order: number;
+  created_at: string;
+}
+
 // ─── Checkout ────────────────────────────────────────────────
 
 export interface CheckoutPayload {
@@ -205,7 +220,8 @@ export interface CheckoutPayload {
     phone: string;
   };
   shipping_address?: ShippingAddress;
-  shipping_method: string;
+  shipping_method: ShippingMethodKey;
+  pickup_point_id?: string;
   payment_method: string;
   coupon_code?: string;
   notes?: string;

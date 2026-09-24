@@ -2,7 +2,7 @@ import { ProductImage } from '@/components/ui/ProductImage';
 import styles from './TrustBadges.module.css';
 
 const BADGES = [
-  { icon: 'lightning.png', title: 'Envío express', sub: 'Gratis desde S/ 150' },
+  { icon: 'lightning.png', title: 'Recojo gratis', sub: 'En puntos seleccionados' },
   { icon: 'shield.png', title: '100% originales', sub: 'Productos con licencia' },
   { icon: 'refresh.png', title: 'Devoluciones 30 días', sub: 'Sin complicaciones' },
   { icon: 'lock.png', title: 'Pago seguro', sub: 'Cifrado SSL' },

@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '@/store/useStore';
 import { formatPrice } from '@/lib/format';
+import { shippingCost } from '@/lib/cart';
 import { CouponInput } from '@/components/cart/CouponInput';
+import type { PickupPoint, ShippingMethodKey } from '@/lib/types';
 import styles from './page.module.css';
 
 interface CouponData {
@@ -26,6 +28,7 @@ export default function CheckoutPage() {
   const [result, setResult] = useState<OrderResult | null>(null);
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [appliedCoupon, setAppliedCoupon] = useState<CouponData | null>(null);
+  const [pickupPoints, setPickupPoints] = useState<PickupPoint[]>([]);
 
   const [form, setForm] = useState({
     name: '',
@@ -36,14 +39,15 @@ export default function CheckoutPage() {
     state: '',
     zip: '',
     country: 'Peru',
-    shipping_method: 'standard',
+    shipping_method: 'standard' as ShippingMethodKey,
+    pickup_point_id: '',
     payment_method: 'whatsapp',
     notes: '',
   });
 
-  const isPickup = form.shipping_method.startsWith('pickup_');
-  const shippingCost = isPickup ? 0 : subtotal >= 150 ? 0 : 14.90;
-  const total = Math.max(0, subtotal - couponDiscount + shippingCost);
+  const isPickup = form.shipping_method === 'pickup';
+  const shippingCostValue = shippingCost(form.shipping_method);
+  const total = Math.max(0, subtotal - couponDiscount + shippingCostValue);
 
   // Redirect to WhatsApp after order
   useEffect(() => {
@@ -51,6 +55,13 @@ export default function CheckoutPage() {
       window.location.href = result.whatsapp_url;
     }
   }, [result]);
+
+  useEffect(() => {
+    fetch('/api/pickup-points')
+      .then((res) => res.json())
+      .then((data) => setPickupPoints(Array.isArray(data) ? data : []))
+      .catch(() => setPickupPoints([]));
+  }, []);
 
   function updateField(field: string, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -76,6 +87,7 @@ export default function CheckoutPage() {
               phone: form.phone,
             },
         shipping_method: form.shipping_method,
+        pickup_point_id: isPickup ? form.pickup_point_id : undefined,
         payment_method: form.payment_method,
         coupon_code: appliedCoupon?.code,
         notes: form.notes,
@@ -213,9 +225,9 @@ export default function CheckoutPage() {
                     name="shipping"
                     value="standard"
                     checked={form.shipping_method === 'standard'}
-                    onChange={(e) => updateField('shipping_method', e.target.value)}
+                    onChange={() => setForm((f) => ({ ...f, shipping_method: 'standard' }))}
                   />
-                  <span>Envío a domicilio — {subtotal >= 150 ? 'Gratis' : formatPrice(14.9)}</span>
+                  <span>Envío a domicilio — {formatPrice(shippingCost('standard'))}</span>
                 </label>
                 <label className={styles.radio}>
                   <input
@@ -223,30 +235,30 @@ export default function CheckoutPage() {
                     name="shipping"
                     value="express"
                     checked={form.shipping_method === 'express'}
-                    onChange={(e) => updateField('shipping_method', e.target.value)}
+                    onChange={() => setForm((f) => ({ ...f, shipping_method: 'express' }))}
                   />
-                  <span>Envío express (1-2 días) — {formatPrice((subtotal >= 150 ? 0 : 14.9) + 5)}</span>
+                  <span>Envío express (1-2 días) — {formatPrice(shippingCost('express'))}</span>
                 </label>
-                <label className={styles.radio}>
-                  <input
-                    type="radio"
-                    name="shipping"
-                    value="pickup_fullmarket"
-                    checked={form.shipping_method === 'pickup_fullmarket'}
-                    onChange={(e) => updateField('shipping_method', e.target.value)}
-                  />
-                  <span>Recojo en Full Market — Gratis</span>
-                </label>
-                <label className={styles.radio}>
-                  <input
-                    type="radio"
-                    name="shipping"
-                    value="pickup_expocentro"
-                    checked={form.shipping_method === 'pickup_expocentro'}
-                    onChange={(e) => updateField('shipping_method', e.target.value)}
-                  />
-                  <span>Recojo en Expo Centro — Gratis</span>
-                </label>
+                {pickupPoints.map((point) => (
+                  <label key={point.id} className={`${styles.radio} ${styles.pickupRadio}`}>
+                    <div className={styles.pickupRadioTop}>
+                      <input
+                        type="radio"
+                        name="shipping"
+                        value={point.id}
+                        checked={form.shipping_method === 'pickup' && form.pickup_point_id === point.id}
+                        onChange={() =>
+                          setForm((f) => ({ ...f, shipping_method: 'pickup', pickup_point_id: point.id }))
+                        }
+                      />
+                      <span>Recojo en {point.name} — Gratis</span>
+                    </div>
+                    <div className={styles.radioHint}>
+                      {point.address}
+                      {point.schedule ? ` · ${point.schedule}` : ''}
+                    </div>
+                  </label>
+                ))}
               </div>
 
               {!isPickup && (
@@ -391,14 +403,16 @@ export default function CheckoutPage() {
           )}
           <div className={styles.summaryRow}>
             <span>Envío</span>
-            <span>{shippingCost === 0 ? 'Gratis' : formatPrice(shippingCost)}</span>
+            <span>{shippingCostValue === 0 ? 'Gratis' : formatPrice(shippingCostValue)}</span>
           </div>
           <div className={styles.totalRow}>
             <span>Total</span>
             <span className={styles.total}>{formatPrice(total)}</span>
           </div>
-          {subtotal >= 150 && (
-            <div className={styles.freeShipping}>✓ Envío gratis por superar S/ 150</div>
+          {isPickup && (
+            <div className={styles.freeShipping}>
+              ✓ Recojo gratis en {pickupPoints.find((p) => p.id === form.pickup_point_id)?.name ?? 'el punto elegido'}
+            </div>
           )}
         </div>
       </div>
